@@ -45,7 +45,7 @@ def get_variable_attrs():
     return VAR_ATTRS
 
 
-def get_constraint_attrs()
+def get_constraint_attrs():
     """
     Return a list of constraint attributes.
     
@@ -56,6 +56,7 @@ def get_constraint_attrs()
     
     return CON_ATTRS
 
+    
 def list_constraints(model):
     """
     Print to screen the constraint sets in the model.
@@ -169,6 +170,13 @@ def get_variable_attr(attr, model="", name="", variables=""):
         print "Error: No attributes specified"
         return
     
+    if attr.upper() not in VAR_ATTRS:
+        print "Error: attribute: {0} not a variable attribute.".format(
+                 attr)
+        print "Get list of all variables attributes with the"
+        print "get_variable_attrs() method."
+        return 
+    
     # Make a list of attributes at the top and check against
     # them to make sure that the specified attribute belongs.
 
@@ -207,52 +215,30 @@ def print_variable_attr(attr, model="", name="", variables=""):
                     sorted(var_dict.items())])
 
 
-def print_variable_objective_coeffs(model="", name="", variables=""):
+def set_variable_attr(attr, val, model="", name="", variables=""):
     """
-    Print to screen a list of variable coefficients given
-    by variables specified in the names parameter.
+    Set the attribute of a variable.
 
-    If a model is given then first get the variables from
-    the model and then print the coefficients.
-
-    If a list of variables is given then print the 
-    coefficients of the variables to screen.
     """
-    print_variable_attr("Obj", model=model, 
-                        name=name, variables=variables)
+    if not attr or not val:
+        print "Error: No attribute or value specified"
+        return
+    
+    if attr.upper() not in VAR_ATTRS:
+        print "Error: attribute: {0} not a variable attribute.".format(
+                 attr)
+        print "Get list of all variable attributes with the"
+        print "get_variable_attrs() method."
+        return 
 
+    if not model and not variables:
+        print "Error: No model or variables specified"
+        return
+    
+    variables = variables_check(name, model, variables)
 
-def print_variable_X(model="", name="", variables=""):
-    """
-    Print to screen a list of variable solution values given
-    by variables specified in the names parameter.
-
-    If a model is given then first get the variables from
-    the model and then print the X values.
-
-    If a list of variables is given then print the 
-    X values of the variables to screen.
-    """
-    print_variable_attr("X", model=model, 
-                        name=name, variables=variables)
-
-
-def set_variable_objective_coeffs(val=1.0, name="", model="", variables=""):
-    """
-    Set the objective coefficients for the variables given
-    by names.
-
-    Can take either a model or a list of variables to set the
-    objective coefficients of.
-
-    Default value is 1.0 use the val kwarg to specify otherwise.
-
-    Model is not updated in the function.
-    """
-
-    set_variable_attr("Obj", val=val, model=model, 
-                      name=name, variables=variables)
-
+    for v in variables:
+        setattr(v, attr, val)
 
 
 def zero_all_objective_coeffs(model):
@@ -285,19 +271,6 @@ def set_variable_bounds(lb="", ub="", model="", name="", variables=""):
                           name=name, variables=variables)
 
 
-def set_variable_bounds_from_dict(bounds_dict, model="", 
-                                  name="", variables=""):
-    """
-    Set the lower bound and/or upper bound for a set(s) of 
-    variables from a dictionary specifying by variable
-    the bounds to give it.
-    """
-
-    # 31 May 2016 - this is complicated, maybe don't jump on
-    # it right away.
-    pass
-
-
 def remove_variables_from_model(model="", name="", variables=""):
     """
     Remove the variables given by names or the variables list
@@ -317,24 +290,6 @@ def remove_variables_from_model(model="", name="", variables=""):
 
     for v in variables:
         model.remove(v)
-
-
-def set_variable_attr(attr, val, model="", name="", variables=""):
-    """
-
-    """
-    if not attr or not val:
-        print "Error: No attribute or value specified"
-        return
-
-    if not model and not variables:
-        print "Error: No model or variables specified"
-        return
-    
-    variables = variables_check(name, model, variables)
-
-    for v in variables:
-        setattr(v, attr, val)
 
 
 def variables_check(name, model, variables):
@@ -358,7 +313,7 @@ def variables_check(name, model, variables):
     return variables
     
     
-def get_index_value(variable, index):
+def get_variable_index_value(variable, index):
     """
     Return the value of the given index
     for a given variable.
@@ -368,11 +323,19 @@ def get_index_value(variable, index):
     """
 
     value = variable.varName.split(",")[index].strip()
-    if "]" in value:
+    if VAR_BRACKET_R in value:
         value = value[:-1]
-    elif "[" in value:
-        value = value.split("[")[1]
-
+    elif VAR_BRACKET_L in value:
+        value = value.split(VAR_BRACKET_L)[1]
+    
+    # Not expecting many variable index values to
+    # to be floats
+    if value.isdigit:
+        try: 
+            value = int(value)
+        except ValueError:
+            pass
+            
     return value
 
 
@@ -387,8 +350,6 @@ def get_linexp_from_variables(variables):
         linexp += v
 
     return linexp
-
-  
 
 
 def sum_variables_by_index(index, model="", name="", variables=""):
@@ -412,14 +373,14 @@ def sum_variables_by_index(index, model="", name="", variables=""):
     return new_dict
 
 
-def print_variable_dict(var_dict):
+def print_dict(dictionary):
     """
-    Print a variable dictionary to screen.
+    Print a dictionary to screen.
     """
 
     print "\n".join(["{0}, {1}".format(index_name, index_value)
                      for index_name, index_value in 
-                     sorted(var_dict.items())])
+                     sorted(dictionary.items())])
                      
                      
 def print_variables_sum_by_index(index, model="", name="", variables=""):
@@ -429,7 +390,7 @@ def print_variables_sum_by_index(index, model="", name="", variables=""):
     
     var_dict = sum_variables_by_index(index, model=model,
                                          name=name, variables=variables)
-    print_variable_dict(var_dict)
+    print_dict(var_dict)
 
 
 def get_variables_by_index(index, model="", name="", variables=""):
@@ -439,7 +400,7 @@ def get_variables_by_index(index, model="", name="", variables=""):
     variables having that index.
     """
 
-    if not index:
+    if index != 0 and not index:
         print "Error: no index given"
         return
     if not model and not variables:
@@ -456,7 +417,7 @@ def get_variables_by_index(index, model="", name="", variables=""):
 
     for v in variables:
 
-        value = get_index_value(v, index)
+        value = get_variable_index_value(v, index)
         if value not in var_dict:
             var_dict[value] = [v]
         else:
@@ -481,20 +442,17 @@ def filter_variables_by_index_value(variables, index_values, exclude=False):
         print "Error: dictionary of index_values not given"
         return
 
-    # If the index array separater is not "]" make the change here
-    sep = "]"
-
     new_vars = []
     for index, value in index_values.iteritems():
         for v in variables:
-            name = get_index_value(v, index)
+            name = get_variable_index_value(v, index)
             if value == name:
                 new_vars.append(v)
 
     if not exclude:
         return new_vars
     else:
-        # May want to adding sorting by varName here
+        # May want to add sorting by varName here
         return [v for v in (set(variables)-set(new_vars))]
         
         
@@ -513,10 +471,58 @@ def get_variables_by_index_values(model, name, index_values, exclude=False):
     
     return filtered_variables
 
+def get_variables_by_two_indices(index1, index2, model="", name="", variables=""):
+    """
+    Return a dictionary having keys of index1 names for the given
+    variables and the given variables and values dictionaries
+    of the given variable by index2.
+    """
+    
+    two_indices_dict = {}
+    index1_dict = get_variables_by_index(index1, model=model, name=name,
+                                      variables=variables)
+    for key, value in index1_dict.iteritems():
+        two_indices_dict[key] = get_variables_by_index(index2, variables=value)
+        
+    return two_indices_dict
+    
+    
+def sum_variables_by_two_indices(index1, index2, model="", name="", variables=""):
+    """
+    Return a dictionary having keys of index1 names
+    for the given variable  and values dictionaries
+    of the given variables summed over index2.
+    """
+
+    two_indices_dict = get_variables_by_two_indices(index1, index2,
+                                        model=model, name=name, variables=variables)
+    if not two_indices_dict:
+        print "Error: problem with inputs"
+        return
+        
+    new_dict = {}
+    for key, var_dict in two_indices_dict.iteritems():
+        new_dict[key] = {index_name: sum([v.X for v in index_vars])
+                for index_name, index_vars in 
+                sorted(var_dict.items())}
+
+    return new_dict
+ 
+ 
+def print_two_indices_dict(indices_dict):
+    """
+    Print to screen a nested dictionary of 
+    two indices.
+    """
+    
+    for key, value in indices_dict.iteritems():
+        print "### {0} ###\n".format(key)
+        print_dict(value)
+
 
 def get_linexp_by_index(index, model="", name="", variables=""):
     """
-    Return a dictionary of index value and variables
+    Return a dictionary of index value and linear expressions
     corresponding to that index value summed as a linear
     expression.
     """
@@ -527,7 +533,7 @@ def get_linexp_by_index(index, model="", name="", variables=""):
 
     for v in variables:
 
-        value = get_index_value(v, index)
+        value = get_variable_index_value(v, index)
         
         if value not in linexps:
             linexps[value] = gp.LinExpr(v)
@@ -602,6 +608,13 @@ def get_constraints_attr(attr, model="", name="", constraints=""):
     if not attr:
         print "Error: No attributes specified"
         return
+        
+    if attr.upper() not in CON_ATTRS:
+        print "Error: attribute: {0} not a constraint attribute.".format(
+                 attr)
+        print "Get list of all constraint attributes with the"
+        print "get_constraint_attrs() method."
+        return 
 
     # Check if the attr supplied is not a viable model attribute
     if not model and not constraints:
@@ -638,52 +651,21 @@ def print_constraints_attr(attr, model="", name="", constraints=""):
                      for c, k in sorted(constraints.items())])
 
 
-def print_constraint_slacks(model="", name="", constraints=""):
+def set_constraints_attr(attr, val, model="", name="", constraints=""):
     """
-    Print to screen a list of constraint slack values
-    given by the constraints specified in the names parameter.
-    
-    If a model is given then first get the constraints from
-    the model and then print the slacks.
-
-    If a list of constraints is given then print the 
-    slacks of the constraints to screen.
-
-    If names not specified then return slacks for all 
-    constraints.
-    """
-
-    print_constraint_attr("Slack", model=model,
-                          name=name, constraints=constraints)
-
-
-def print_constraint_duals(model="", name="", constraints=""):
-    """
-    Print to screen a list of constraint dual values
-    given by the constraints specified in the names parameter.
-    
-    If a model is given then first get the constraints from
-    the model and then print the duals.
-
-    If a list of constraints is given then print the 
-    duals of the constraints to screen.
-
-    If names not specified then return duals for all 
-    constraints.
-    """
-
-    print_constraint_attr("Pi", model=model,
-                          name=name, constraints=constraints)
-
-
-def set_constraint_attr(attr, val, model="", name="", constraints=""):
-    """
-    Set an attribute o a
+    Set an attribute of a model constraint.
     """
 
     if not attr or not val:
         print "Error: No attribute or value specified"
         return
+    
+    if attr.upper() not in CON_ATTRS:
+        print "Error: attribute: {0} not a constraint attribute.".format(
+                 attr)
+        print "Get list of all constraint attributes with the"
+        print "get_constraint_attrs() method."
+        return 
 
     if not model and not constraints:
         print "Error: No model or constraints specified"
@@ -693,29 +675,6 @@ def set_constraint_attr(attr, val, model="", name="", constraints=""):
 
     for c in constraints:
         setattr(c, attr, val)
-
-
-def set_constraint_sense(val, model="", name="", constraints=""):
-    """
-    Set the constraint sense for a set of constraints.
-    Must be either ">", "<", or "=".
-    """
-
-    if val not in ["<", ">", "="]:
-        print "Error: value specified is not '<', '>', or '='"
-        return
-
-    set_constraint_attr("Sense", val, model=model,
-                        name=name, constraints=constraints)
-
-
-def set_constraint_rhs(val, model="", name="", constraints=""):
-    """
-    Set the right hand side value of a set of constraints.
-    """
-
-    set_constraint_attr("RHS", val, model=model, 
-                        name=name, constraints=constraints)
 
 
 def remove_constraints_from_model(model, name="", constraints=""):
@@ -731,6 +690,103 @@ def remove_constraints_from_model(model, name="", constraints=""):
 
     for c in constraints:
         model.remove(c)
+
+        
+def get_constraint_index_value(constraint, index):
+    """
+    Return the value of the given index
+    for a given constraint.
+
+    Constraint names are assumed to be given
+    as A(a,c,d, ....,f)
+    """
+
+    value = constraint.constrName.split(",")[index].strip()
+    if CON_BRACKET_R in value:
+        value = value[:-1]
+    elif CON_BRACKET_L in value:
+        value = value.split(CON_BRACKET_L)[1]
+
+    return value
+
+
+def get_constraints_by_index(index, model="", name="", constraints=""):
+    """
+    Return a dictionary of constraints with keys
+    of the specified index and values a list of
+    constraints having that index.
+    """
+
+    if not index:
+        print "Error: no index given"
+        return
+    if not model and not constraints:
+        print "Error: no model or constraints given"
+        return
+    
+    if not (name and model) and not constraints:
+        print "Error: please specify the constraints you want to print"
+        return
+
+    constraints = constraints_check(name, model, constraints)
+
+    con_dict = {}
+
+    for c in constraints:
+
+        value = get_constraint_index_value(c, index)
+        if value not in con_dict:
+            con_dict[value] = [c]
+        else:
+            con_dict[value].append(c)
+
+    return con_dict
+
+
+def filter_constraints_by_index_value(constraints, index_values, exclude=False):
+    """
+    Return a filtered list of constraints.
+    index_values dictionary provides index numbers as keys
+    and a list of index values as values.
+    If exlude is False then return constraints that match the filters.
+    If exclude is True than return constraints that do not match the filters.
+    """
+
+    if not constraints:
+        print "Error: variables not given"
+        return
+    if not index_values:
+        print "Error: dictionary of index_values not given"
+        return
+
+    new_cons = []
+    for index, value in index_values.iteritems():
+        for c in constraints:
+            name = get_constraints_index_value(c, index)
+            if value == name:
+                new_cons.append(c)
+
+    if not exclude:
+        return new_cons
+    else:
+        # May want to add sorting by varName here
+        return [v for v in (set(constraints)-set(new_cons))]
+        
+        
+def get_constraints_by_index_values(model, name, index_values, exclude=False):
+    """
+    Return a list of constraints filtered by index values.
+    
+    If exlude is False then return constraints that match the filters.
+    If exclude is True than return constraints that do not match the filters.
+    """
+    
+    constraints = get_constraints(model, name)
+    
+    filtered_constraints = filter_constraints_by_index_value(
+        constraints, index_values, exclude)
+    
+    return filtered_constraints
 
 
 def get_grb_sense_from_string(sense):
@@ -750,13 +806,14 @@ def get_grb_sense_from_string(sense):
         return
 
 
-def add_sum_constraint_constant(model, constant, sense="<", 
+def add_constraint_constant(model, constant, sense="<", 
                                 name="", variables="", con_name=""):
-    """Add constraint to model that says the sum of 
-    variables must equal a constant."""
+    """
+    Add constraint to model that says the sum of 
+    variables must be =, <, or , > a constant.
+    """
 
-    if not variables:
-        variables = variables_check(name, model, variables)
+    variables = variables_check(name, model, variables)
 
     linexp = get_linexp_from_variables(variables)
 
@@ -788,7 +845,7 @@ def check_if_name_a_variable(name, model):
 def check_if_name_a_constraint(name, model):
     """
     Check if the supplied name corresopnd to
-    a cosntraint set name in the given model.
+    a constraint set name in the given model.
     """
 
     constraints = get_constraints(model, name)
@@ -799,10 +856,12 @@ def check_if_name_a_constraint(name, model):
     return True
 
 
-def add_sum_constraint_variables(model, variables1, variables2, 
+def add_constraint_variables(model, variables1, variables2, 
                                  sense="=", con_name=""):
-    """Add constraint to model that says the sum of
-    variables1 must equal the sum of variables2."""
+    """
+    Add constraint to model that says the sum of
+    variables1 must be =, < , > the sum of variables2.
+    """
 
     if not variables1 or not variables2:
         print "Error: variables list not provided"
@@ -822,17 +881,14 @@ def add_sum_constraint_variables(model, variables1, variables2,
     else:
         model.addConstr(linexp1, sense, linexp2, con_name)
 
-
+        
 def graph_by_index(model, variables, index, title="", y_axis="", x_axis=""):
     """
     Display a graph of the variable against the specified index
     using matplotlib. 
 
     Matplotlib must already be installed to use this.
-    
-    Crucially, the variable must be in the form x[a,b]
-    where x is any identifier name and one of the indice
-    sets a, or b, represent time period.
+    See: http://matplotlib.org/faq/installing_faq.html
     """
     try:
         import matplotlib.pyplot as plot
@@ -860,7 +916,61 @@ def graph_by_index(model, variables, index, title="", y_axis="", x_axis=""):
     #ax.legend(keys)
 
     plot.show()
+    
+ 
+def graph_by_two_indices(model, variables, index1, index2, title="",
+                                 y_axis="", x_axis=""):
+    """
+    Display a graph of the variable summed over index2
+    given by index1.
+    
+    Matplotlib must already be installed to use this.
+    See: http://matplotlib.org/faq/installing_faq.html
+    """
+    try:
+        import matplotlib.pyplot as plot
+    except ImportError:
+        print "Error: Module Matplotlib not found."
+        print "Please download and install Matplotlib to use this function."
+        return
+    
+    fig = plot.figure()
+    ax = fig.add_subplot(111)
+    
+    # We need to do this in reverse order to prepare it for graphing
+    variables_sum = sum_variables_by_two_indices(index2, index1, 
+                                       variables=variables)
 
+    keys, values = zip(*variables_sum.items())
+    
+    colours = ["b", "g", "r", "c", "y", "m", "k", "w"]
+
+
+    y = range(len(values[0]))
+    print y
+    
+    if title:
+        ax.set_title(title)
+    if y_axis:
+        ax.set_ylabel(y_axis)
+    if x_axis:
+        ax.set_xlabel(x_axis)
+    bars = []
+    
+    prev_bars = [0 for bar in y]
+    colour_count = 0
+    for key, value in variables_sum.iteritems():
+        cur_bars = [k[1] for k in sorted(value.items(), key=lambda x: x[0])]
+        bars.append(ax.bar(y, cur_bars, bottom=prev_bars, 
+                                color=colours[colour_count]))
+        prev_bars = cur_bars
+        colour_count += 1
+        if colour_count == len(colours) - 1:
+            colour_count = 0
+    ax.legend(keys)
+
+    plot.show()
+                         
 
 def print_variables_to_csv(file_name, model="", name="",
                            variables="", headers=""):
