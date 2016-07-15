@@ -20,6 +20,9 @@ CON_BRACKET_R = ")"
 VAR_BRACKET_L = "["
 VAR_BRACKET_R = "]"
 
+
+# 13 July 2016 - Need to sort out capitalization here for attributes
+
 # Attributes of a Gurobi variable
 VAR_ATTRS = ["LB", "UB", "Obj", "VType", "VarName", "X", "Xn", "RC",
              "BarX", "Start", "VarHintVal", "VarHintPri", "BranchPriority", 
@@ -31,6 +34,14 @@ VAR_ATTRS = ["LB", "UB", "Obj", "VType", "VarName", "X", "Xn", "RC",
 CON_ATTRS = ["Sense", "RHS", "ConstrName", "Pi", "Slack",
              "CBasis", "DStart", "Lazy", "IISConstr", 
              "SARHSLow", "SARHSUp", "FarkasDual"]
+
+
+def read_model(filename):
+    """
+    Read a model using gurobipy.
+    """
+
+    m = gp.read(filename)
 
 
 def get_variable_attrs():
@@ -156,7 +167,7 @@ def get_variables(model, name="", approx=False):
                 if name in v.varName.split(VAR_BRACKET_L)[0]]
 
 
-def get_variable_attr(attr, model="", name="", variables=""):
+def get_variables_attr(attr, model="", name="", variables=""):
     """
     Return a dictionary of variables names for the given
     varaible set mapped to
@@ -189,7 +200,7 @@ def get_variable_attr(attr, model="", name="", variables=""):
     return {v.varName: getattr(v, attr) for v in variables}
 
 
-def print_variable_attr(attr, model="", name="", variables=""):
+def print_variables_attr(attr, model="", name="", variables=""):
     """
     Print to screen a list of variable attribute values
     given by the variables specified in the names parameter.
@@ -215,7 +226,7 @@ def print_variable_attr(attr, model="", name="", variables=""):
                     sorted(var_dict.items())])
 
 
-def set_variable_attr(attr, val, model="", name="", variables=""):
+def set_variables_attr(attr, val, model="", name="", variables=""):
     """
     Set the attribute of a variable.
 
@@ -254,7 +265,7 @@ def zero_all_objective_coeffs(model):
         v.Obj = 0
 
 
-def set_variable_bounds(lb="", ub="", model="", name="", variables=""):
+def set_variables_bounds(lb="", ub="", model="", name="", variables=""):
     """
     Set the lower bound and/or upper bound for a set(s) of 
     variables.
@@ -677,6 +688,32 @@ def set_constraints_attr(attr, val, model="", name="", constraints=""):
         setattr(c, attr, val)
 
 
+def set_constraints_rhs_as_percent(percent, model="", name="", constraints=""):
+    """
+    Set the rhs of a constraint set as a percent of its current rhs.
+    """
+
+    if percent != 0 and not percent:
+        print "Error: No percent specified."
+        return
+
+    try:
+        percent = float(percent)
+    except ValueError:
+        print "Percent must be a number. Percent: {}".format(percent)
+        return
+
+    if not model and not constraints:
+        print "Error: no model or constraints specified."
+        return
+
+    constraints = constraints_check(name, model, constraints)
+
+    for c in constraints:
+        cur_rhs = getattr(c, "rhs")
+        setattr(c, percent*cur_rhs)
+
+
 def remove_constraints_from_model(model, name="", constraints=""):
     """
     Remove the specified constraints from the model.
@@ -1060,6 +1097,9 @@ def print_variables_to_json_by_index(file_name, index, model="",
     data = {index_name: [{ index_name: var_dict }] }
 
     json.dump(data, open(file_name, "wb"))
+
+
+# I don't want to include the functions at the bottom.
 
 
 def tune_model(name, model, timelimit=7200):

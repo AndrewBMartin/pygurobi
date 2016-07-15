@@ -68,6 +68,9 @@ What are the actual periodic harvest levels?
 ```
 Well, that's too messy. Let's try a different way. Recall that for the **harv[r,s,t]** variables, index 0 is r, region, index 1 is s, species, and index 2 (or -1, a.k.a. last index) is t, period.
 
+
+
+
 ```python
 # The first argument references the index we want to sum variables by. 
 # In this case this is the periods index which for the harvest variables is
@@ -76,7 +79,6 @@ Well, that's too messy. Let's try a different way. Recall that for the **harv[r,
 >>> pg.print_dict(periodic_harvest)
 ...
 ```
-
 That's much nicer. Notice how I passed `pg.sum_variables_by_index` a model object and the name of a set of variables. This syntax allows me to access variables without managing them in the interpreter. There are however use cases where it's preferable to pass a list of variables to be summed. PyGurobi offers syntax for this as well.
 
 
