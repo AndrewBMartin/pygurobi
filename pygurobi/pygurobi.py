@@ -42,6 +42,19 @@ def read_model(filename):
     """
 
     m = gp.read(filename)
+    
+    return m
+    
+    
+def reoptimize(m):
+    """
+    Update, reset, and optimize
+    a model.
+    """
+    
+    m.update()
+    m.reset()
+    m.optimize()
 
 
 def get_variable_attrs():
@@ -711,7 +724,8 @@ def set_constraints_rhs_as_percent(percent, model="", name="", constraints=""):
 
     for c in constraints:
         cur_rhs = getattr(c, "rhs")
-        setattr(c, percent*cur_rhs)
+        print cur_rhs
+        setattr(c, "RHS", percent*cur_rhs)
 
 
 def remove_constraints_from_model(model, name="", constraints=""):
