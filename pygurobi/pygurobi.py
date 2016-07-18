@@ -1,5 +1,5 @@
 """
-30 May 2016
+15 July 2016
 
 A library of functions to analyze and modify Gurobi models.
 
@@ -180,6 +180,48 @@ def get_variables(model, name="", approx=False):
                 if name in v.varName.split(VAR_BRACKET_L)[0]]
 
 
+def check_attr(attr, attributes):
+    """
+    Check if the attr string is contained in a list of athe attr string is contained in a list of attributes.
+
+    The check is case-insensitive.
+    """
+    for a in attributes:
+
+        if attr == a:
+            return True
+        if attr == a.lower():
+            return True
+        if attr == a.upper():
+            return True
+
+    return False
+
+
+def check_variable_attr(attr):
+    """
+    Check if a string corresponds to a variable attribute.
+
+    Case-insensitive.
+    """
+
+    var_attrs = get_variable_attrs()
+
+    return check_attr(attr, var_attrs)
+
+
+def check_constraint_attr(attr):
+    """
+    Check if a string corresponds to a variable attribute.
+
+    Attributes are case-insensitive.
+    """
+
+    con_attrs = get_constraint_attrs()
+
+    return check_attr(attr, con_attrs)
+
+
 def get_variables_attr(attr, model="", name="", variables=""):
     """
     Return a dictionary of variables names for the given
@@ -194,7 +236,7 @@ def get_variables_attr(attr, model="", name="", variables=""):
         print "Error: No attributes specified"
         return
     
-    if attr.upper() not in VAR_ATTRS:
+    if not check_variable_attr(attr):
         print "Error: attribute: {0} not a variable attribute.".format(
                  attr)
         print "Get list of all variables attributes with the"
@@ -248,7 +290,7 @@ def set_variables_attr(attr, val, model="", name="", variables=""):
         print "Error: No attribute or value specified"
         return
     
-    if attr.upper() not in VAR_ATTRS:
+    if not check_variable_attr(attr):
         print "Error: attribute: {0} not a variable attribute.".format(
                  attr)
         print "Get list of all variable attributes with the"
@@ -633,7 +675,7 @@ def get_constraints_attr(attr, model="", name="", constraints=""):
         print "Error: No attributes specified"
         return
         
-    if attr.upper() not in CON_ATTRS:
+    if not check_constraint_attr(attr):
         print "Error: attribute: {0} not a constraint attribute.".format(
                  attr)
         print "Get list of all constraint attributes with the"
@@ -684,7 +726,7 @@ def set_constraints_attr(attr, val, model="", name="", constraints=""):
         print "Error: No attribute or value specified"
         return
     
-    if attr.upper() not in CON_ATTRS:
+    if not check_constraint_attr(attr):
         print "Error: attribute: {0} not a constraint attribute.".format(
                  attr)
         print "Get list of all constraint attributes with the"
@@ -725,7 +767,7 @@ def set_constraints_rhs_as_percent(percent, model="", name="", constraints=""):
     for c in constraints:
         cur_rhs = getattr(c, "rhs")
         print cur_rhs
-        setattr(c, "RHS", percent*cur_rhs)
+        setattr(c, "rhs", percent*cur_rhs)
 
 
 def remove_constraints_from_model(model, name="", constraints=""):
