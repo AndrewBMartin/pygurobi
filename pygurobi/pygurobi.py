@@ -273,7 +273,7 @@ def print_variables_attr(attr, model="", name="", variables=""):
     neither model nor variables is given.
     """
 
-    var_dict = get_variable_attr(attr, model=model,
+    var_dict = get_variables_attr(attr, model=model,
                                  name=name, variables=variables)
 
 
@@ -329,11 +329,11 @@ def set_variables_bounds(lb="", ub="", model="", name="", variables=""):
     """
 
     if lb:
-        set_variable_attr("lb", val=lb, model=model, 
+        set_variables_attr("lb", val=lb, model=model, 
                           name=name, variables=variables)
 
     if ub:
-        set_variable_attr("ub", val=ub, model=model, 
+        set_variables_attr("ub", val=ub, model=model, 
                           name=name, variables=variables)
 
 
@@ -536,7 +536,8 @@ def get_variables_by_index_values(model, name, index_values, exclude=False):
         variables, index_values, exclude)
     
     return filtered_variables
-
+    
+    
 def get_variables_by_two_indices(index1, index2, model="", name="", variables=""):
     """
     Return a dictionary having keys of index1 names for the given
@@ -582,7 +583,7 @@ def print_two_indices_dict(indices_dict):
     """
     
     for key, value in indices_dict.iteritems():
-        print "### {0} ###\n".format(key)
+        print "\n{0}".format(key)
         print_dict(value)
 
 
@@ -766,7 +767,6 @@ def set_constraints_rhs_as_percent(percent, model="", name="", constraints=""):
 
     for c in constraints:
         cur_rhs = getattr(c, "rhs")
-        print cur_rhs
         setattr(c, "rhs", percent*cur_rhs)
 
 
@@ -799,6 +799,14 @@ def get_constraint_index_value(constraint, index):
         value = value[:-1]
     elif CON_BRACKET_L in value:
         value = value.split(CON_BRACKET_L)[1]
+        
+    # Not expecting many constraint index values to
+    # to be floats
+    if value.isdigit:
+        try: 
+            value = int(value)
+        except ValueError:
+            pass
 
     return value
 
@@ -855,7 +863,7 @@ def filter_constraints_by_index_value(constraints, index_values, exclude=False):
     new_cons = []
     for index, value in index_values.iteritems():
         for c in constraints:
-            name = get_constraints_index_value(c, index)
+            name = get_constraint_index_value(c, index)
             if value == name:
                 new_cons.append(c)
 
@@ -886,6 +894,9 @@ def get_grb_sense_from_string(sense):
     """
     Return the GRB constraint sense object
     corresponding to the supplied string.
+    
+    Convention follows the Gurobi docs:
+    https://www.gurobi.com/documentation/6.5/refman/sense.html#attr:Sense
     """
 
     if sense == "<":
@@ -899,20 +910,23 @@ def get_grb_sense_from_string(sense):
         return
 
 
-def add_constraint_constant(model, constant, sense="<", 
-                                name="", variables="", con_name=""):
+def add_constraint_constant(model, variables, constant, sense="<", 
+                                      con_name=""):
     """
     Add constraint to model that says the sum of 
     variables must be =, <, or , > a constant.
     """
-
-    variables = variables_check(name, model, variables)
-
+    
+    if not variables:
+        print "Error: variables list not provided"
+        return
+    
     linexp = get_linexp_from_variables(variables)
 
     sense = get_grb_sense_from_string(sense)
 
     if not sense:
+        print "Error: please provide '<', '>', or '=' for constraint sense."
         return
 
     if not con_name:
@@ -1065,8 +1079,7 @@ def graph_by_two_indices(model, variables, index1, index2, title="",
     plot.show()
                          
 
-def print_variables_to_csv(file_name, model="", name="",
-                           variables="", headers=""):
+def print_variables_to_csv(file_name, model="", name="", variables=""):
     """
     Print the specified variables to a csv file
     given by the file_name parameter.
@@ -1081,18 +1094,19 @@ def print_variables_to_csv(file_name, model="", name="",
 
     with open(file_name, "wb+") as write_file:
         writer = csv.writer(write_file)
-        if headers:
-            headers = headers.split(",")
-            writer.writerow(headers)
+
+        headers = ["Variable name", "Value"]
+        writer.writerow(headers)
 
         variables = variables_check(name, model, variables) 
-
+        
+        # This will put quotes around strings, because the variable
+        # names have commas in them.
         writer.writerows([ [v.varName, v.X] for v in variables])
 
 
 def print_variables_to_csv_by_index(file_name, index, 
-                                    model="", name="", variables="",
-                                    headers=""):
+                                    model="", name="", variables=""):
     """
     Print the sums of variables by the specified index
     to a csv file.
@@ -1108,9 +1122,8 @@ def print_variables_to_csv_by_index(file_name, index,
     with open(file_name, "wb+") as write_file:
         writer = csv.writer(write_file)
 
-        if headers:
-            headers = headers.split(",")
-            writer.writerow(headers)
+        headers = ["Index", "Value"]
+        writer.writerow(headers)
 
         variables_dict = sum_variables_by_index(index, model=model,
                                             name=name, variables=variables)
@@ -1118,7 +1131,6 @@ def print_variables_to_csv_by_index(file_name, index,
         if not variables_dict:
             print "Error: please specify the variables you want to print"
             return
-        print "writing"
 
         writer.writerows([ [key, value] 
                         for key, value in sorted(variables_dict.items())])
@@ -1131,9 +1143,6 @@ def print_variables_to_json_by_index(file_name, index, model="",
     organized by the specified index.
 
     Formatted for reading into nvD3 applications.
-
-    If file_name does not contain json extension then it will
-    be added.
 
     Default behaviour is to overwrite file if one exists in
     file_name's location.
@@ -1153,80 +1162,4 @@ def print_variables_to_json_by_index(file_name, index, model="",
     data = {index_name: [{ index_name: var_dict }] }
 
     json.dump(data, open(file_name, "wb"))
-
-
-# I don't want to include the functions at the bottom.
-
-
-def tune_model(name, model, timelimit=7200):
-    """
-    Tune a model.
-    Write out the resulting parameter settings
-    as .prm file with name given by name paramter.
-
-    If model not supplied then read in the model
-    using the name parameter.
-
-    Timelimit defaults to 7200 seconds
-    """
-    if not model:
-        print "Error: no model supplied"
-        return
-
-    if not name:
-        print "Error: no name for the parameter file supplied"
-        return 
-
-    model.setParam('TuneTimeLimit', timelimit)
-    model.tune()
-    for i in range(model.tuneResultCount):
-        model.getTuneResult(i)
-        model.write("{0}_{1}.prm".format(name, str(i)))
-
-
-def compress_model(model):
-    """
-    Remove everything except variable
-    and constraint objects from a model.
-
-    Warning: optimization and updates can no longer 
-    be performed after a model has been
-    compressed.
-
-    Compression cannot be undone.
-
-    All non modifying functions in this library
-    will still work on a compressed model.
-    """
-    model = compressedModel(model)
-
-    return model
-
-
-def optimize_write_model(basis_name, model="", model_name="",):
-    """
-    Optimize a model and if solution is optimal
-    write a basis file using model_name.
-    """
-
-    if ".bas" not in basis_name:
-        print "Error: basis file name not specified"
-        return
-
-    if model:
-        model.optimize()
-    elif model_name:
-        try:
-            model = gp.read(model_name)
-            model.optimize()
-        except Exception, e:
-            raise
-    else:
-        print "Error: neither model nor model_name given"
-        return
-
-    if model.status == gp.GRB.status.OPTIMAL:
-        model.write(basis_name)
-    else:
-        print "Model status: ", model.status
 
