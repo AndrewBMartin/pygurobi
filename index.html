@@ -1,0 +1,318 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>PyGurobi</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+</head>
+<body>
+<div id="header">
+<h1 class="title">PyGurobi</h1>
+<h1 class="subtitle">Rapid interactive Gurobi model modification and analysis</h1>
+</div>
+<ul>
+<li>Quickly visualize the results of modelling</li>
+<li>Powerful variable and constraint querying</li>
+<li>Create linear expressions and new constraints on the fly</li>
+</ul>
+<p>PyGurobi extends the already awesome <a href="https://www.gurobi.com/documentation/6.5/quickstart_mac/the_gurobi_python_interfac.html">Gurobi Python API</a>. It's a Python library that comes out of almost 5 years experience working with the Gurobi Python API. These functions accelerate modelling with Gurobi by allowing you to perform deeper analysis interactively while writing less interpreter code.</p>
+<p>I'm not associated with the Gurobi company, just a long-time user of their product.</p>
+<p><strong>Requirements</strong>: Python 2.7+, a working <a href="http://gurobi.com">Gurobi</a> license, <a href="https://www.gurobi.com/documentation/6.5/quickstart_mac/the_gurobi_python_interfac.html">gurobipy</a> installed, optional (for graphing only) <a href="http://matplotlib.org/">Matplotlib</a>.</p>
+<p><strong>Install</strong>: <code>pip install pygurobi</code> or download this repo and run <code>python setup.py install</code></p>
+<p>An important note before starting, PyGurobi by default assumes that <em>variable names</em> are separated from indices by square brackets &quot;[&quot; and &quot;]&quot;, and that <em>constraint names</em> are separated from indices by round brackets &quot;(&quot; and &quot;)&quot;. For example, variables look like <strong>x[i,j]</strong> and constraints look like <strong>env(r,t)</strong>. If this is not your convention then you can modify PyGurobi to use your bracketing convetion by accessing the source code. You can find the location of the PyGurobi source code using the <code>inspect.getfile()</code> command:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> inspect
+<span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pygurobi
+<span class="op">&gt;&gt;&gt;</span> inspect.getfile(pygurobi)
+<span class="co">&#39;/Users/admin/app/env/lib/python2.7/site-packages/pygurobi/__init__.pyc&#39;</span> 
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># Your path will be different but should still have &quot;/pygurobi/__init__.py&quot; at the end.</span></code></pre></div>
+<p>If you've installed PyGurobi, then when you issue <code>inspect.getfile(pygurobi)</code> you'll see the path to the PyGurobi folder with the same ending as the one shown above. Open this folder and then open the <a href="https://github.com/AndrewBMartin/pygurobi/blob/master/pygurobi/pygurobi.py">pygurobi.py</a> file in a texteditor. Change the <code>CON_BRACKET_L</code>, <code>CON_BRACKET_R</code>, <code>VAR_BRACKET_L</code> and <code>VAR_BRACKET_R</code> global variables to the constraint and variable brackets that you use, and you'll be set to go.</p>
+<h1 id="example-model">Example Model</h1>
+<p>I'll demonstrate how to use PyGurobi with a simple forest management Linear Programming model. Find it in the pygurobi directory as <a href="https://github.com/AndrewBMartin/pygurobi/blob/master/pygurobi/forest.lp">forest.lp</a>.</p>
+<p><a href="https://github.com/AndrewBMartin/pygurobi/blob/master/pygurobi/forest.lp">forest.lp</a> is a harvest scheduling model that seeks the optimal assignment of harvest schedules to cut-blocks. Our forest management model will run for 10 periods where each period represents 10 years.</p>
+<p>The objective is to <strong>maximize the total volume of timber harvested</strong>.</p>
+<p>The variables are:</p>
+<ul>
+<li><strong>x[i,j]</strong> - the number of hectares of cut-block, <em>i</em>, to be managed under schedule <em>j</em>, where <em>j</em> is a sequence of harvests. Each cut-block, <em>i</em>, has both hardwood and softwood timber species, belongs to either the north or south region, and has an initial age.</li>
+<li><strong>harv[s,r,t]</strong> - the volume of timber harvested from cut-blocks of species <em>s</em> (softwood or hardwood), in region, <em>r</em> (north or south), , in period <em>t</em>.</li>
+<li><strong>age[r,t]</strong> - the area of the forest that is at least 60 years old in region, <em>r</em>, and period, <em>t</em>.</li>
+</ul>
+<p>The constraints are:</p>
+<ul>
+<li><strong>gub(i)</strong> - assignment problem constraints that say that no more than the area of each cut-block can be assigned to harvest schedules.</li>
+<li><strong>harv(s,r,t)</strong> - inventory constraints that say that the <strong>harv[s,r,t]</strong> variables equal the volume harvested from cut-blocks of species, <em>s</em>, belonging to region, <em>r</em>, in period, <em>t</em>.</li>
+<li><strong>age(r,t)</strong> - inventory constraints that say that the <strong>age[r,t]</strong> variables equal the sum of cut-blocks that are at least age 60 in period, <em>t</em>, and belong to region, <em>r</em>.</li>
+<li><strong>env(r, t)</strong> - environmental constraints that say that at least 20% of the forest in each region, <em>r</em> has to be age 60 or greater after period 5.</li>
+</ul>
+<p>Code to generate similar models can be found in the <a href="https://github.com/AndrewBMartin/or-models/blob/master/sample_lp.py">or-models repository</a>.</p>
+<p>We'll talk about the <em>index of a variable</em> often in the following demonstration, i.e. the <strong>[s,r,t]</strong> part of <strong>harv[s,r,t]</strong>.</p>
+<p>To demonstrate how to use PyGurobi, we're going to optimize the model, analyze it, and then modify model constraints. Some familiarity with the Gurobi Python API, called gurobipy, is assumed, and the gurobipy Python package must be installed to follow along with the example or use PyGurobi.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> pygurobi <span class="im">as</span> pg 
+<span class="op">&gt;&gt;&gt;</span> m <span class="op">=</span> pg.read_model(<span class="st">&quot;forest.lp&quot;</span>)
+<span class="op">&gt;&gt;&gt;</span> m.optimize()
+Optimize a model <span class="cf">with</span> <span class="dv">160</span> rows, <span class="dv">1945</span> columns <span class="op">and</span> <span class="dv">10172</span> nonzeros
+Coefficient statistics:
+  Matrix <span class="bu">range</span>    [<span class="fl">1e+00</span>, <span class="fl">2e+02</span>]
+  Objective <span class="bu">range</span> [<span class="fl">1e+00</span>, <span class="fl">1e+00</span>]
+  Bounds <span class="bu">range</span>    [<span class="fl">0e+00</span>, <span class="fl">0e+00</span>]
+  RHS <span class="bu">range</span>       [<span class="fl">1e+00</span>, <span class="fl">1e+01</span>]
+Presolve removed <span class="dv">50</span> rows <span class="op">and</span> <span class="dv">1102</span> columns
+Presolve time: <span class="fl">0.</span>06s
+Presolved: <span class="dv">110</span> rows, <span class="dv">843</span> columns, <span class="dv">2770</span> nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       <span class="dv">0</span>    <span class="fl">4.1153473e+04</span>   <span class="fl">1.100000e+01</span>   <span class="fl">0.000000e+00</span>      0s
+      <span class="dv">20</span>    <span class="fl">4.0724706e+04</span>   <span class="fl">0.000000e+00</span>   <span class="fl">0.000000e+00</span>      0s
+
+Solved <span class="op">in</span> <span class="dv">20</span> iterations <span class="op">and</span> <span class="fl">0.08</span> seconds
+Optimal objective  <span class="fl">4.072470571e+04</span></code></pre></div>
+<p>We find that we have an optimal objective of 40,725 m<sup>3</sup> of harvest volume.</p>
+<p>First, let's review the model. First we'll list the variable sets and constraint sets.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> pg.list_variables(m)
+Variable <span class="bu">set</span>, Number of variables
+x, <span class="dv">1963</span>
+harv, <span class="dv">40</span>
+age, <span class="dv">20</span>
+
+<span class="op">&gt;&gt;&gt;</span> pg.list_constraints(m)
+Constraint <span class="bu">set</span>, Number of constraints
+age, <span class="dv">10</span>
+env, <span class="dv">10</span>
+gub, <span class="dv">100</span>
+harv, <span class="dv">40</span></code></pre></div>
+<p>We see that we have 3 variable sets, <strong>x</strong>, <strong>harv</strong>, and <strong>age</strong> with 1963, 40, and 20 variables in each, respectively. While there's 4 constraint sets, <strong>age</strong>, <strong>env</strong>, <strong>gub</strong>, and <strong>harv</strong> with 10, 10, 100, and 40 constraints, respectively.</p>
+<p>Moving forward to model analysis, from the solution we want to know the periodic harvest volumes, so we'll print the &quot;X&quot; attribute, i.e. the solution value, of all the variables in the <strong>harv</strong> set.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> <span class="co"># Print the specified attribute, in this case &quot;X&quot;, of</span>
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># the specified variable set, in this case &quot;harv&quot;, from model, m.</span>
+<span class="op">&gt;&gt;&gt;</span> pg.print_variable_attr(<span class="st">&quot;X&quot;</span>, model<span class="op">=</span>m, name<span class="op">=</span><span class="st">&quot;harv&quot;</span>)
+harv[hw,north,<span class="dv">0</span>], <span class="fl">1728.47824679</span>
+harv[hw,north,<span class="dv">1</span>], <span class="fl">132.119561697</span>
+harv[hw,north,<span class="dv">2</span>], <span class="fl">660.597808483</span>
+harv[hw,north,<span class="dv">3</span>], <span class="fl">660.597808483</span>
+harv[hw,north,<span class="dv">4</span>], <span class="fl">996.054224258</span>
+harv[hw,north,<span class="dv">5</span>], <span class="fl">0.0</span>
+harv[hw,north,<span class="dv">6</span>], <span class="fl">150.0</span>
+harv[hw,north,<span class="dv">7</span>], <span class="fl">450.0</span>
+harv[hw,north,<span class="dv">8</span>], <span class="fl">750.0</span>
+harv[hw,north,<span class="dv">9</span>], <span class="fl">4460.13364558</span>
+harv[hw,south,<span class="dv">0</span>], <span class="fl">1032.1195617</span>
+...</code></pre></div>
+<p>This output is too messy to make much sense out of though. This is because each <strong>harv</strong> variable is indexed by region and species as well as period, so it's hard to see what the periodic harvest volumes are. Let's try a different way instead. Recall that for the <strong>harv[s,r,t]</strong> variables, index 0 is <em>s</em>, species, index 1 is <em>r</em>, region, and index 2 (or -1, a.k.a. last index) is <em>t</em>, period.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> <span class="co"># In the following function first argument references the index we want to sum variables by. </span>
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># In this case this is the periods index which for the harvest variables is</span>
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># the last index. This can be represented as 2 or -1 (using Python indexing notation).</span>
+<span class="op">&gt;&gt;&gt;</span> periodic_harvest <span class="op">=</span> pg.sum_variables_by_index(<span class="op">-</span><span class="dv">1</span>, model<span class="op">=</span>m, name<span class="op">=</span><span class="st">&quot;harv&quot;</span>)
+<span class="op">&gt;&gt;&gt;</span> pg.print_dict(periodic_harvest)
+<span class="dv">0</span>, <span class="fl">5598.37093395</span>
+<span class="dv">1</span>, <span class="fl">2517.06768112</span>
+<span class="dv">2</span>, <span class="fl">2517.06768112</span>
+<span class="dv">3</span>, <span class="fl">1957.71930754</span>
+<span class="dv">4</span>, <span class="fl">2915.86019735</span>
+<span class="dv">5</span>, <span class="fl">0.0</span>
+<span class="dv">6</span>, <span class="fl">900.0</span>
+<span class="dv">7</span>, <span class="fl">900.0</span>
+<span class="dv">8</span>, <span class="fl">3000.0</span>
+<span class="dv">9</span>, <span class="fl">20418.6199105</span></code></pre></div>
+<p>That's much easier to read. We can clearly see how much volume is harvested in each of the 10 periods.</p>
+<p>Notice how we passed <code>pg.sum_variables_by_index</code> a model object, m, and the name of a set of variables, &quot;harv&quot;. This syntax allows us to access variables without managing them in the interpreter. There are however use cases where it's preferable to manage variables in the interpreter, for instance to pass a list of variables to be summed. PyGurobi offers syntax for this as well.</p>
+<p>As an example, consider the case where we want to see the volume of softwood, sw, harvested in each period.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># Print periodic softwood harvest volume.</span>
+
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># Pass the following function a dictionary with index numbers as keys</span>
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># and index values to filter by as values. In this example, {0: &quot;sw&quot;} says only return variables</span>
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># that have value &quot;sw&quot; (softwood) in index 0.</span>
+<span class="op">&gt;&gt;&gt;</span> softwood_harvest <span class="op">=</span> pg.get_variables_by_index_values(m, <span class="st">&quot;harv&quot;</span>, {<span class="dv">0</span>: <span class="st">&quot;sw&quot;</span>})
+<span class="op">&gt;&gt;&gt;</span> periodic_softwood_harvest <span class="op">=</span> pg.sum_variables_by_index(<span class="op">-</span><span class="dv">1</span>, variables<span class="op">=</span>softwood_harvest)
+<span class="op">&gt;&gt;&gt;</span> pg.print_dict(periodic_softwood_harvest)
+<span class="dv">0</span>, <span class="fl">2837.77312547</span>
+<span class="dv">1</span>, <span class="fl">1327.99162585</span>
+<span class="dv">2</span>, <span class="fl">1327.99162585</span>
+<span class="dv">3</span>, <span class="fl">1032.88237566</span>
+<span class="dv">4</span>, <span class="fl">1543.74804444</span>
+<span class="dv">5</span>, <span class="fl">0.0</span>
+<span class="dv">6</span>, <span class="fl">450.0</span>
+<span class="dv">7</span>, <span class="fl">450.0</span>
+<span class="dv">8</span>, <span class="fl">1500.0</span>
+<span class="dv">9</span>, <span class="fl">10610.9584725</span></code></pre></div>
+<p>Here we got a list of variables representing softwood harvest volumes using <code>pg.get_variables_by_index_values</code>, and then passed them to <code>pg.sum_variables_by_index</code> to sum the variables by period.</p>
+<p>To demonstrate how much code PyGurobi can save you from writing, consider printing this same data using only the Gurobi Python API.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> <span class="co"># Print periodic softwood volume</span>
+<span class="op">&gt;&gt;&gt;</span> 
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># Possible to do this step with a list comprehension in fewer lines, </span>
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># but that would be less clear.</span>
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># Get softwood harvest variables</span>
+<span class="op">&gt;&gt;&gt;</span> softwood_variables <span class="op">=</span> []
+<span class="op">&gt;&gt;&gt;</span> <span class="cf">for</span> v <span class="op">in</span> m.getVars():
+...    split_name <span class="op">=</span> v.varName.split(<span class="st">&quot;[&quot;</span>)
+...    <span class="cf">if</span> <span class="st">&quot;harv&quot;</span> <span class="op">==</span> split_name[<span class="dv">0</span>]:
+...        indices <span class="op">=</span> split_name[<span class="dv">1</span>].split(<span class="st">&quot;,&quot;</span>)
+...        <span class="cf">if</span> <span class="st">&quot;sw&quot;</span> <span class="op">==</span> indices[<span class="dv">0</span>]:
+...            softwood_variables.append(v)
+...
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># Create dictionary of softwood variables by period</span>
+<span class="op">&gt;&gt;&gt;</span> var_dict <span class="op">=</span> {}
+<span class="op">&gt;&gt;&gt;</span> <span class="cf">for</span> v <span class="op">in</span> softwood_variables:
+...     period <span class="op">=</span> v.varName.split(<span class="st">&quot;,&quot;</span>)[<span class="op">-</span><span class="dv">1</span>][:<span class="op">-</span><span class="dv">1</span>]
+...     <span class="cf">if</span> period <span class="op">not</span> <span class="op">in</span> var_dict:
+...         var_dict[period] <span class="op">=</span> [v]
+...     <span class="cf">else</span>:
+...         var_dict[period].append(v)
+...
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># Sum the softwood harvest volume by period</span>
+<span class="op">&gt;&gt;&gt;</span> summed_vars <span class="op">=</span> {index_name: <span class="bu">sum</span>([v.X <span class="cf">for</span> v <span class="op">in</span> index_vars])
+...                       <span class="cf">for</span> index_name, index_vars <span class="op">in</span> 
+...                       <span class="bu">sorted</span>(var_dict.items())}
+...                       
+<span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>.join([<span class="st">&quot;</span><span class="sc">{0}</span><span class="st">, </span><span class="sc">{1}</span><span class="st">&quot;</span>.<span class="bu">format</span>(index_name, index_value)                 
+...                     <span class="cf">for</span> index_name, index_value <span class="op">in</span>.                            
+...                     <span class="bu">sorted</span>(summed_vars.items())])
+<span class="dv">0</span>, <span class="fl">2837.77312547</span>
+<span class="dv">1</span>, <span class="fl">1327.99162585</span>
+<span class="dv">2</span>, <span class="fl">1327.99162585</span>
+<span class="dv">3</span>, <span class="fl">1032.88237566</span>
+<span class="dv">4</span>, <span class="fl">1543.74804444</span>
+<span class="dv">5</span>, <span class="fl">0.0</span>
+<span class="dv">6</span>, <span class="fl">450.0</span>
+<span class="dv">7</span>, <span class="fl">450.0</span>
+<span class="dv">8</span>, <span class="fl">1500.0</span>
+<span class="dv">9</span>, <span class="fl">10610.9584725</span></code></pre></div>
+<p>That's a lot more code than the PyGurobi version (20 lines versus 3 lines). We see that it takes less time to perform the analysis with PyGurobi than the Gurobi Python API, which also means there's less likelihood of making mistakes.</p>
+<p>PyGurobi we can also display graphs using <a href="http://matplotlib.org/">Matplotlib</a> (install separately).</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> <span class="co"># Display a graph of periodic harvest levels.</span>
+<span class="op">&gt;&gt;&gt;</span> 
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># Get the variables to graph</span>
+<span class="op">&gt;&gt;&gt;</span> harvest <span class="op">=</span> pg.get_variables(m, <span class="st">&quot;harv&quot;</span>)
+<span class="op">&gt;&gt;&gt;</span> 
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># Graph the variables</span>
+<span class="op">&gt;&gt;&gt;</span> pg.graph_by_index(m, harvest, <span class="op">-</span><span class="dv">1</span>, title<span class="op">=</span><span class="st">&quot;Periodic Volume&quot;</span>, y_axis<span class="op">=</span><span class="st">&quot;Cubic Meters&quot;</span>, x_axis<span class="op">=</span><span class="st">&quot;Period&quot;</span>)</code></pre></div>
+<div class="figure">
+<img src="https://github.com/AndrewBMartin/pygurobi/blob/master/images/harvest_volume.png?raw=true" />
+
+</div>
+<p>This allows us to easily visualize relationships in our data. In this case, drawing our attention to the fact that almost no timber is harvested in periods 5, 6 and 7.</p>
+<p>In addition to model analysis, PyGurobi enables us to modify constraints. For instance, if we want to change the right hand side of the environemntal constraints (<strong>env</strong>) so that we have at least 40% of forest over 60 years old in each region instead of 20%.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> <span class="co"># Multiply the right hand side of all &quot;env&quot; constraints by 2</span>
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># to change the constraint from 20% to 40%.</span>
+<span class="op">&gt;&gt;&gt;</span> pg.set_constraint_rhs_as_percent(<span class="dv">2</span>, model<span class="op">=</span>m, name<span class="op">=</span><span class="st">&quot;env&quot;</span>)
+<span class="op">&gt;&gt;&gt;</span> 
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># Update, reset, and optimize the model</span>
+<span class="op">&gt;&gt;&gt;</span> pg.reoptimize(m)
+Optimize a model <span class="cf">with</span> <span class="dv">160</span> rows, <span class="dv">1945</span> columns <span class="op">and</span> <span class="dv">10172</span> nonzeros
+Coefficient statistics:
+  Matrix <span class="bu">range</span>    [<span class="fl">1e+00</span>, <span class="fl">2e+02</span>]
+  Objective <span class="bu">range</span> [<span class="fl">1e+00</span>, <span class="fl">1e+00</span>]
+  Bounds <span class="bu">range</span>    [<span class="fl">0e+00</span>, <span class="fl">0e+00</span>]
+  RHS <span class="bu">range</span>       [<span class="fl">1e+00</span>, <span class="fl">2e+01</span>]
+Presolve removed <span class="dv">50</span> rows <span class="op">and</span> <span class="dv">1102</span> columns
+Presolve time: <span class="fl">0.</span>02s
+Presolved: <span class="dv">110</span> rows, <span class="dv">843</span> columns, <span class="dv">2770</span> nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       <span class="dv">0</span>    <span class="fl">4.1153473e+04</span>   <span class="fl">3.800000e+01</span>   <span class="fl">0.000000e+00</span>      0s
+      <span class="dv">65</span>    <span class="fl">3.8280531e+04</span>   <span class="fl">0.000000e+00</span>   <span class="fl">0.000000e+00</span>      0s
+
+Solved <span class="op">in</span> <span class="dv">65</span> iterations <span class="op">and</span> <span class="fl">0.02</span> seconds
+Optimal objective  <span class="fl">3.828053089e+04</span></code></pre></div>
+<p>Not surprisingly, we see the objective value decrease - by about 5% -because the model must cut less wood than the original model to satisfy the new more difficult environmental constraints.</p>
+<p>Let's graph the result the same way as before.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> harvest <span class="op">=</span> pg.get_variables(m, <span class="st">&quot;harv&quot;</span>)
+<span class="op">&gt;&gt;&gt;</span> pg.graph_by_index(m, harvest, <span class="op">-</span><span class="dv">1</span>, title<span class="op">=</span><span class="st">&quot;Periodic Volume&quot;</span>, y_axis<span class="op">=</span><span class="st">&quot;Cubic Meters&quot;</span>, x_axis<span class="op">=</span><span class="st">&quot;Period&quot;</span>)</code></pre></div>
+<div class="figure">
+<img src="https://github.com/AndrewBMartin/pygurobi/blob/master/images/harvest_volume_age_con.png?raw=true" />
+
+</div>
+<p>Looking at harvest volumes, we see that they're all over the place. In the last period the model cuts almost 20,000 m<sup>3</sup> and in period 4 it cuts nothing. For more predictable timber flow, we'd like to smooth out harvests so that in each period we're cutting the same amount of volume. To achieve this we'll add a constraint saying that in each period, harvest volume has to be the same as it is in the subsequent period.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> <span class="co"># Add this constraint period by period: harvest volume in </span>
+<span class="op">&gt;&gt;&gt;</span> <span class="co"># period n has to equal the harvest volume in period n + 1</span>
+<span class="op">&gt;&gt;&gt;</span> <span class="cf">for</span> n <span class="op">in</span> <span class="bu">range</span>(<span class="dv">9</span>):
+<span class="op">&gt;&gt;&gt;</span> 
+<span class="op">&gt;&gt;&gt;</span>     <span class="co"># Get harvest variables from period n</span>
+<span class="op">&gt;&gt;&gt;</span>     variables1 <span class="op">=</span> pg.get_variables_by_index_values(m, <span class="st">&quot;harv&quot;</span>, {<span class="op">-</span><span class="dv">1</span>: n})
+<span class="op">&gt;&gt;&gt;</span>     
+<span class="op">&gt;&gt;&gt;</span>     <span class="co"># Get harvest variables from period n+1</span>
+<span class="op">&gt;&gt;&gt;</span>     variables2 <span class="op">=</span> pg.get_variables_by_index_values(m, <span class="st">&quot;harv&quot;</span>, {<span class="op">-</span><span class="dv">1</span>: n<span class="dv">+1</span>})
+<span class="op">&gt;&gt;&gt;</span>     
+<span class="op">&gt;&gt;&gt;</span>     <span class="co"># Create  constraint in the form Σ(variables1) = Σ(variables2)</span>
+<span class="op">&gt;&gt;&gt;</span>     pg.add_constraint_variables(m, variables1, variables2, sense<span class="op">=</span><span class="st">&quot;=&quot;</span>, con_name<span class="op">=</span><span class="st">&quot;even&quot;</span>)</code></pre></div>
+<p>So now we've added a set of constraints, called <strong>even</strong>, that say in each period the volume harvested must equal the volume harvested in the next period.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> pg.reoptimize(m)
+Optimize a model <span class="cf">with</span> <span class="dv">169</span> rows, <span class="dv">1945</span> columns <span class="op">and</span> <span class="dv">10244</span> nonzeros
+Coefficient statistics:
+  Matrix <span class="bu">range</span>    [<span class="fl">1e+00</span>, <span class="fl">2e+02</span>]
+  Objective <span class="bu">range</span> [<span class="fl">1e+00</span>, <span class="fl">1e+00</span>]
+  Bounds <span class="bu">range</span>    [<span class="fl">0e+00</span>, <span class="fl">0e+00</span>]
+  RHS <span class="bu">range</span>       [<span class="fl">1e+00</span>, <span class="fl">2e+01</span>]
+Presolve removed <span class="dv">46</span> rows <span class="op">and</span> <span class="dv">46</span> columns
+Presolve time: <span class="fl">0.</span>05s
+Presolved: <span class="dv">123</span> rows, <span class="dv">1899</span> columns, <span class="dv">7639</span> nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       <span class="dv">0</span>    <span class="fl">5.5798741e+05</span>   <span class="fl">4.323514e+03</span>   <span class="fl">0.000000e+00</span>      0s
+     <span class="dv">424</span>    <span class="fl">2.5034308e+04</span>   <span class="fl">0.000000e+00</span>   <span class="fl">0.000000e+00</span>      0s
+
+Solved <span class="op">in</span> <span class="dv">424</span> iterations <span class="op">and</span> <span class="fl">0.06</span> seconds
+Optimal objective  <span class="fl">2.503430827e+04</span></code></pre></div>
+<p>We'll graph periodic harvest volumes to visualize the results.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> harvest <span class="op">=</span> pg.get_variables(m, <span class="st">&quot;harv&quot;</span>)
+<span class="op">&gt;&gt;&gt;</span> pg.graph_by_index(m, harvest, <span class="op">-</span><span class="dv">1</span>, title<span class="op">=</span><span class="st">&quot;Periodic Volume&quot;</span>, y_axis<span class="op">=</span><span class="st">&quot;Cubic Meters&quot;</span>, x_axis<span class="op">=</span><span class="st">&quot;Period&quot;</span>)</code></pre></div>
+<div class="figure">
+<img src="https://github.com/AndrewBMartin/pygurobi/blob/master/images/harvest_volume_even.png?raw=true" />
+
+</div>
+<p>We see that total harvest has gone down by about 35%, but every period harvests the same volume.</p>
+<p>Now before wrapping up, we'll look at the harvest volumes by region, showing how much volume comes from the north and the south, respectively.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> <span class="co"># By region</span>
+<span class="op">&gt;&gt;&gt;</span> pg.graph_by_two_indices(m, harvest, <span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, title<span class="op">=</span><span class="st">&quot;Periodic Volume by Region&quot;</span>, y_axis<span class="op">=</span><span class="st">&quot;Cubic Meters&quot;</span>, x_axis<span class="op">=</span><span class="st">&quot;Period&quot;</span>)</code></pre></div>
+<div class="figure">
+<img src="https://github.com/AndrewBMartin/pygurobi/blob/master/images/harvest_volume_by_region.png?raw=true" />
+
+</div>
+<p>And, by species, showing the proportion of harvest volume that comes from softwood and hardwood.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span>  <span class="co"># By species</span>
+<span class="op">&gt;&gt;&gt;</span>  pg.graph_by_two_indices(m, harvest, <span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, title<span class="op">=</span><span class="st">&quot;Periodic Volume by Species&quot;</span>, y_axis<span class="op">=</span><span class="st">&quot;Cubic Meters&quot;</span>, x_axis<span class="op">=</span><span class="st">&quot;Period&quot;</span>)</code></pre></div>
+<div class="figure">
+<img src="https://github.com/AndrewBMartin/pygurobi/blob/master/images/harvest_volume_by_species.png?raw=true" />
+
+</div>
+<p>And that wraps up our introduction to PyGurobi. With this forest management model example, we've shown some of the key features of PyGurobi. We analyzed model variables in just a few lines of code, we added a non-trivial constraint with a simple for-loop, and we visualized the results of our modelling using 1 and 2 index graphs.</p>
+<p>There's more to discover once you get started using PyGurobi, but I hope this tutorial has given you a taste of how to use it to make modelling in Gurobi faster and easier.</p>
+</body>
+</html>
