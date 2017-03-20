@@ -9,7 +9,6 @@ import json
 
 import gurobipy as gp
 
-#from compressed_model import compressedModel
 
 # Assuming that constraints are of the form: 
 # constraintName(index1,index2,...,indexN).
@@ -89,8 +88,8 @@ def list_constraints(model):
 
     A constraint set is composed of all constraints
     sharing the same string identifier before the indices:
-        A[2,3,4] and A[1,2,3] are in the same constraint set, A;
-        A[2,3,4] and B[2,3,4] are in constraint sets A and B, respectively
+        A(2,3,4) and A(1,2,3) are in the same constraint set, A;
+        A(2,3,4) and B(2,3,4) are in constraint sets A and B, respectively
     """
 
     sets = {}
@@ -156,7 +155,7 @@ def get_variables_multiple(model, names_list, approx=False):
     return var_list
 
 
-def get_variables(model, name="", approx=False):
+def get_variables(model, name="", approx=False, filter_values={}, exclude=False):
     """
     Return a list of variables from the variable
     set given by name.
@@ -165,24 +164,36 @@ def get_variables(model, name="", approx=False):
     each entry from names is "in" each variable set name
     otherwise, check using "==".
 
+    If filter_values specified as a dicitonary of index to value to filter 
+    for. Exclude means when filtering return variables that match the index
+    or return values that do not match the index.
+
     If name not specified, then return a list of
     all model variables.
     """
 
     if not name:
         return model.getVars()
-
+    
+    variables = []
     if not approx:
-        return [v for v in model.getVars() 
+        variables = [v for v in model.getVars() 
                 if v.varName.split(VAR_BRACKET_L)[0] == name]
     else:
-        return [v for v in model.getVars()
+        variables = [v for v in model.getVars()
                 if name in v.varName.split(VAR_BRACKET_L)[0]]
+
+    if filter_values:
+        variables = filter_variables(filter_values, variables=variables, 
+                exclude=exclude)
+
+    return variables
 
 
 def check_attr(attr, attributes):
     """
-    Check if the attr string is contained in a list of athe attr string is contained in a list of attributes.
+    Check if the attr string is contained in a list of athe attr string is contained 
+    in a list of attributes.
 
     The check is case-insensitive.
     """
@@ -190,9 +201,7 @@ def check_attr(attr, attributes):
 
         if attr == a:
             return True
-        if attr == a.lower():
-            return True
-        if attr == a.upper():
+        if attr.lower() == a.lower():
             return True
 
     return False
@@ -233,24 +242,21 @@ def get_variables_attr(attr, model="", name="", variables=""):
     """
 
     if not attr:
-        print "Error: No attributes specified"
-        return
+        raise AttributeError("No attributes specified")
     
     if not check_variable_attr(attr):
-        print "Error: attribute: {0} not a variable attribute.".format(
-                 attr)
-        print "Get list of all variables attributes with the"
-        print "get_variable_attrs() method."
-        return 
+        raise AttributeError("{0}\n{1}\n{2}".format(
+        "Attribute: {0} not a variable attribute.".format(attr),
+        "Get list of all variables attributes with the",
+        "get_variable_attrs() method.")
     
     # Make a list of attributes at the top and check against
     # them to make sure that the specified attribute belongs.
 
     if not model and not variables:
-        print "Error: No model or variable list given"
-        return 
+        raise ValueError("No model or variable list given")
 
-    variables = variables_check(name, model, variables)
+    variables = variables_check(model, name, variables)
 
     return {v.varName: getattr(v, attr) for v in variables}
 
@@ -287,21 +293,19 @@ def set_variables_attr(attr, val, model="", name="", variables=""):
 
     """
     if not attr or not val:
-        print "Error: No attribute or value specified"
+        raise AttributeError("No attribute or value specified")
         return
     
     if not check_variable_attr(attr):
-        print "Error: attribute: {0} not a variable attribute.".format(
-                 attr)
-        print "Get list of all variable attributes with the"
-        print "get_variable_attrs() method."
-        return 
+        raise AttributeError("{0}\n{1}\n{2}".format(
+        "Attribute: {0} not a variable attribute.".format(attr),
+        "Get list of all variables attributes with the",
+        "get_variable_attrs() method.")
 
     if not model and not variables:
-        print "Error: No model or variables specified"
-        return
+        raise ValueError("No model or variables specified")
     
-    variables = variables_check(name, model, variables)
+    variables = variables_check(model, name, variables)
 
     for v in variables:
         setattr(v, attr, val)
@@ -313,9 +317,8 @@ def zero_all_objective_coeffs(model):
     """
 
     if not model:
-        print "Error: no model given"
-        return
-
+        raise ValueError("No model given")
+    
     for v in model.getVars():
         v.Obj = 0
 
@@ -337,7 +340,7 @@ def set_variables_bounds(lb="", ub="", model="", name="", variables=""):
                           name=name, variables=variables)
 
 
-def remove_variables_from_model(model="", name="", variables=""):
+def remove_variables_from_model(model, name="", variables=""):
     """
     Remove the variables given by names or the variables list
     from the model.
@@ -346,19 +349,18 @@ def remove_variables_from_model(model="", name="", variables=""):
     """
 
     if not model and not variables:
-        print "Error: no model or variables given"
-        return
-    if not model:
-        print "Error: no model given"
-        return
+        raise ValueError("No model or variables given")
 
-    variables = variables_check(name, model, variables)
+    if not model:
+        raise ValueError("No model given")
+
+    variables = variables_check(model, name, variables)
 
     for v in variables:
         model.remove(v)
 
 
-def variables_check(name, model, variables):
+def variables_check(model, name, variables):
     """
     Return the appropriate
     variables based on the information supplied.
@@ -429,8 +431,7 @@ def sum_variables_by_index(index, model="", name="", variables=""):
     var_dict = get_variables_by_index(index, model=model, name=name,
                                       variables=variables)
     if not var_dict:
-        print "Error: problem with inputs"
-        return
+        raise ValueError("No variables found".format(index))
 
     new_dict = {index_name: sum([v.X for v in index_vars])
                 for index_name, index_vars in 
@@ -467,17 +468,15 @@ def get_variables_by_index(index, model="", name="", variables=""):
     """
 
     if index != 0 and not index:
-        print "Error: no index given"
-        return
+        raise IndexError("No index given")
+    
     if not model and not variables:
-        print "Error: no model or variables given"
-        return
+        raise ValueError("No model or variables given")
     
     if not (name and model) and not variables:
-        print "Error: please specify the variables you want to print"
-        return
+        raise ValueError("No variables specified")
 
-    variables = variables_check(name, model, variables)
+    variables = variables_check(model, name, variables)
 
     var_dict = {}
 
@@ -492,7 +491,7 @@ def get_variables_by_index(index, model="", name="", variables=""):
     return var_dict
 
 
-def filter_variables_by_index_value(variables, index_values, exclude=False):
+def filter_variables(variables, filter_values, exclude=False):
     """
     Return a filtered list of variables.
     index_values dictionary provides index numbers as keys
@@ -502,18 +501,21 @@ def filter_variables_by_index_value(variables, index_values, exclude=False):
     """
 
     if not variables:
-        print "Error: variables not given"
-        return
-    if not index_values:
-        print "Error: dictionary of index_values not given"
-        return
+        raise ValueError("variables not given")
+    
+    if not filter_values:
+        raise ValueError("Dictionary of filter values not given")
 
     new_vars = []
-    for index, value in index_values.iteritems():
-        for v in variables:
-            name = get_variable_index_value(v, index)
-            if value == name:
-                new_vars.append(v)
+    for v in variables:
+        add = True
+        for index, value in filter_values.iteritems():
+            key = pg.get_variable_index_value(v, index)
+            if key != value:
+                add = False
+                break
+        if add:
+            new_vars.append(v)
 
     if not exclude:
         return new_vars
@@ -521,14 +523,36 @@ def filter_variables_by_index_value(variables, index_values, exclude=False):
         # May want to add sorting by varName here
         return [v for v in (set(variables)-set(new_vars))]
         
-        
-def get_variables_by_index_values(model, name, index_values, exclude=False):
+
+
+
+
+def get_variables_by_index_values(index_values, model="", name="", exclude=False):
     """
     Return a list of variables filtered by index values.
     
     If exlude is False then return variables that match the filters.
     If exclude is True than return variables that do not match the filters.
     """
+
+    
+    if not variables:
+        variables = pg.get_variables(model, name)
+
+    new_vars = []
+    for v in variables:
+        add = True
+        for index, value in index_values.iteritems():
+            key = pg.get_variable_index_value(v, index)
+            if key != value:
+                add = False
+                break
+        if add:
+            new_vars.append(v)
+
+    return new_vars
+        
+def get_variables_by_index_values(model, name, index_values, exclude=False):
     
     variables = get_variables(model, name)
     
@@ -564,8 +588,7 @@ def sum_variables_by_two_indices(index1, index2, model="", name="", variables=""
     two_indices_dict = get_variables_by_two_indices(index1, index2,
                                         model=model, name=name, variables=variables)
     if not two_indices_dict:
-        print "Error: problem with inputs"
-        return
+        raise ValueError("Inputs did not match with model variables")
         
     new_dict = {}
     for key, var_dict in two_indices_dict.iteritems():
@@ -596,7 +619,7 @@ def get_linexp_by_index(index, model="", name="", variables=""):
 
     linexps = {}
 
-    variables = variables_check(name, model, variables)
+    variables = variables_check(model, name, variables)
 
     for v in variables:
 
@@ -673,20 +696,17 @@ def get_constraints_attr(attr, model="", name="", constraints=""):
     """
 
     if not attr:
-        print "Error: No attributes specified"
-        return
+        raise AttributeError("No attributes specified")
         
     if not check_constraint_attr(attr):
-        print "Error: attribute: {0} not a constraint attribute.".format(
-                 attr)
-        print "Get list of all constraint attributes with the"
-        print "get_constraint_attrs() method."
-        return 
+        raise AttributeError("{0}\n{1}\n{2}".format(
+        "Attribute: {0} not a constraint attribute.".format(attr),
+        "Get list of all variables attributes with the",
+        "get_constraint_attrs() method.")
 
     # Check if the attr supplied is not a viable model attribute
     if not model and not constraints:
-        print "Error: No model or constraint list given"
-        return 
+        raise ValueError("No model or constraint list given")
 
     constraints = constraints_check(name, model, constraints)
 
@@ -724,19 +744,16 @@ def set_constraints_attr(attr, val, model="", name="", constraints=""):
     """
 
     if not attr or not val:
-        print "Error: No attribute or value specified"
-        return
+        raise AttributeError("No attribute or value specified")
     
     if not check_constraint_attr(attr):
-        print "Error: attribute: {0} not a constraint attribute.".format(
-                 attr)
-        print "Get list of all constraint attributes with the"
-        print "get_constraint_attrs() method."
-        return 
+        raise AttributeError("{0}\n{1}\n{2}".format(
+        "Attribute: {0} not a variable attribute.".format(attr),
+        "Get list of all variables attributes with the",
+        "get_variable_attrs() method.")
 
     if not model and not constraints:
-        print "Error: No model or constraints specified"
-        return
+        raise ValueError("No model or constraints specified")
     
     constraints = constraints_check(name, model, constraints)
 
@@ -756,12 +773,10 @@ def set_constraints_rhs_as_percent(percent, model="", name="", constraints=""):
     try:
         percent = float(percent)
     except ValueError:
-        print "Percent must be a number. Percent: {}".format(percent)
-        return
+        raise ValueError("Percent must be a number. Percent: {}".format(percent))
 
     if not model and not constraints:
-        print "Error: no model or constraints specified."
-        return
+        raise ValueError("No model or constraints specified.")
 
     constraints = constraints_check(name, model, constraints)
 
@@ -819,15 +834,13 @@ def get_constraints_by_index(index, model="", name="", constraints=""):
     """
 
     if not index:
-        print "Error: no index given"
-        return
+        raise IndexError("No index given")
+
     if not model and not constraints:
-        print "Error: no model or constraints given"
-        return
+        raise ValueError("No model or constraints given")
     
     if not (name and model) and not constraints:
-        print "Error: please specify the constraints you want to print"
-        return
+        raise ValueError("No constraints specified")
 
     constraints = constraints_check(name, model, constraints)
 
@@ -854,11 +867,10 @@ def filter_constraints_by_index_value(constraints, index_values, exclude=False):
     """
 
     if not constraints:
-        print "Error: variables not given"
-        return
+        raise ValueError("Variables not given")
+        
     if not index_values:
-        print "Error: dictionary of index_values not given"
-        return
+        raise ValueError("Dictionary of index_values not given")
 
     new_cons = []
     for index, value in index_values.iteritems():
@@ -906,8 +918,7 @@ def get_grb_sense_from_string(sense):
     elif sense == "=":
         return gp.GRB.EQUAL
     else:
-        print "Error: constraint sense is not '<', '>', '='"
-        return
+        raise ValueError("Constraint sense is not '<', '>', '='")
 
 
 def add_constraint_constant(model, variables, constant, sense="<", 
@@ -918,16 +929,11 @@ def add_constraint_constant(model, variables, constant, sense="<",
     """
     
     if not variables:
-        print "Error: variables list not provided"
-        return
+        raise ValueError("variables list not provided")
     
     linexp = get_linexp_from_variables(variables)
 
     sense = get_grb_sense_from_string(sense)
-
-    if not sense:
-        print "Error: please provide '<', '>', or '=' for constraint sense."
-        return
 
     if not con_name:
         model.addConstr(linexp, sense, constant)
@@ -971,17 +977,12 @@ def add_constraint_variables(model, variables1, variables2,
     """
 
     if not variables1 or not variables2:
-        print "Error: variables list not provided"
-        return
+        ValueError("Variables list not provided")
 
     linexp1 = get_linexp_from_variables(variables1)
     linexp2 = get_linexp_from_variables(variables2)
 
     sense = get_grb_sense_from_string(sense)
-
-    if not sense:
-        print "Error: please provide '<', '>', or '=' for constraint sense."
-        return
 
     if not con_name:
         model.addConstr(linexp1, sense, linexp2)
@@ -1000,9 +1001,9 @@ def graph_by_index(model, variables, index, title="", y_axis="", x_axis=""):
     try:
         import matplotlib.pyplot as plot
     except ImportError:
-        print "Error: Module Matplotlib not found."
-        print "Please download and install Matplotlib to use this function."
-        return
+        raise ImportError("{0}\n{1}".format(
+        "Module Matplotlib not found.",
+        "Please download and install Matplotlib to use this function.")
         
     fig = plot.figure()
     ax = fig.add_subplot(111)
@@ -1037,9 +1038,9 @@ def graph_by_two_indices(model, variables, index1, index2, title="",
     try:
         import matplotlib.pyplot as plot
     except ImportError:
-        print "Error: Module Matplotlib not found."
-        print "Please download and install Matplotlib to use this function."
-        return
+        raise ImportError("{0}\n{1}".format(
+        "Module Matplotlib not found.",
+        "Please download and install Matplotlib to use this function.")
     
     fig = plot.figure()
     ax = fig.add_subplot(111)
@@ -1089,8 +1090,7 @@ def print_variables_to_csv(file_name, model="", name="", variables=""):
     """
 
     if ".csv" not in file_name:
-        print "Error: non csv file specified"
-        return
+        raise ValueError("Non csv file specified")
 
     with open(file_name, "wb+") as write_file:
         writer = csv.writer(write_file)
@@ -1098,7 +1098,7 @@ def print_variables_to_csv(file_name, model="", name="", variables=""):
         headers = ["Variable name", "Value"]
         writer.writerow(headers)
 
-        variables = variables_check(name, model, variables) 
+        variables = variables_check(model, name, variables) 
         
         # This will put quotes around strings, because the variable
         # names have commas in them.
@@ -1116,8 +1116,7 @@ def print_variables_to_csv_by_index(file_name, index,
     """
 
     if ".csv" not in file_name:
-        print "Error: non csv file specified"
-        return
+        raise ValueError("Non csv file specified")
 
     with open(file_name, "wb+") as write_file:
         writer = csv.writer(write_file)
@@ -1129,8 +1128,7 @@ def print_variables_to_csv_by_index(file_name, index,
                                             name=name, variables=variables)
 
         if not variables_dict:
-            print "Error: please specify the variables you want to print"
-            return
+            raise ValueError("No variables found")
 
         writer.writerows([ [key, value] 
                         for key, value in sorted(variables_dict.items())])
@@ -1149,8 +1147,7 @@ def print_variables_to_json_by_index(file_name, index, model="",
     """
 
     if ".json" not in file_name:
-        print "Error: non json file specified"
-        return
+        raise ValueError("Non json file specified")
         
     index_name = index
     if index_alias:
