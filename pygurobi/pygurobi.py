@@ -88,8 +88,8 @@ def list_constraints(model):
 
     A constraint set is composed of all constraints
     sharing the same string identifier before the indices:
-        A(2,3,4) and A(1,2,3) are in the same constraint set, A;
-        A(2,3,4) and B(2,3,4) are in constraint sets A and B, respectively
+    A(2,3,4) and A(1,2,3) are in the same constraint set, A;
+    A(2,3,4) and B(2,3,4) are in constraint sets A and B, respectively
     """
 
     sets = {}
@@ -119,8 +119,8 @@ def list_variables(model):
 
     A variable set is composed of all variables
     sharing the same string identifier before the indices:
-        A[2,3,4] and A[1,2,3] are in the same variable set, A;
-        A[2,3,4] and B[2,3,4] are in variable sets A and B, respectively
+    A[2,3,4] and A[1,2,3] are in the same variable set, A;
+    A[2,3,4] and B[2,3,4] are in variable sets A and B, respectively
     """
 
     sets = {}

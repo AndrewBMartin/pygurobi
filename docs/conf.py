@@ -18,8 +18,8 @@
 #
 import os
 import sys
-#sys.path.insert(0, "/Users/andrewmartin/code/pygurobi/pygurobi")
 sys.path.insert(0, os.path.abspath("."))
+sys.path.insert(0, "/Users/andrewmartin/code/pygurobi/pygurobi")
 
 
 # -- General configuration ------------------------------------------------
