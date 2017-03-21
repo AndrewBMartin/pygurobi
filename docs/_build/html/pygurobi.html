@@ -42,9 +42,12 @@
           <div class="body" role="main">
             
   <div class="section" id="pygurobi-package">
-<h1>PyGurobi package<a class="headerlink" href="#pygurobi-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="pygurobi-module">
-<h2>pygurobi module<a class="headerlink" href="#pygurobi-module" title="Permalink to this headline">¶</a></h2>
+<h1>pygurobi package<a class="headerlink" href="#pygurobi-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="pygurobi-pygurobi-module">
+<h2>pygurobi.pygurobi module<a class="headerlink" href="#pygurobi-pygurobi-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-pygurobi">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pygurobi" title="Permalink to this headline">¶</a></h2>
@@ -65,6 +68,49 @@ variables1 must be =, &lt; , &gt; the sum of variables2.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="pygurobi.check_attr">
+<code class="descclassname">pygurobi.</code><code class="descname">check_attr</code><span class="sig-paren">(</span><em>attr</em>, <em>attributes</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.check_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the attr string case-insensitively corresponds to a
+Gurobi attribute.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygurobi.check_constraint_attr">
+<code class="descclassname">pygurobi.</code><code class="descname">check_constraint_attr</code><span class="sig-paren">(</span><em>attr</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.check_constraint_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a string corresponds to a constraint attribute.</p>
+<p>Attributes are case-insensitive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygurobi.check_if_name_a_constraint">
+<code class="descclassname">pygurobi.</code><code class="descname">check_if_name_a_constraint</code><span class="sig-paren">(</span><em>name</em>, <em>model</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.check_if_name_a_constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the supplied name corresopnd to
+a constraint set name in the given model.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygurobi.check_if_name_a_variable">
+<code class="descclassname">pygurobi.</code><code class="descname">check_if_name_a_variable</code><span class="sig-paren">(</span><em>name</em>, <em>model</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.check_if_name_a_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the supplied name corresponds to
+a variable set name in the given model.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygurobi.check_variable_attr">
+<code class="descclassname">pygurobi.</code><code class="descname">check_variable_attr</code><span class="sig-paren">(</span><em>attr</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.check_variable_attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a string corresponds to a variable attribute.</p>
+<p>Case-insensitive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygurobi.constraints_check">
+<code class="descclassname">pygurobi.</code><code class="descname">constraints_check</code><span class="sig-paren">(</span><em>model</em>, <em>name</em>, <em>constraints</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.constraints_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check to see whether the user specified a list 
+of constraints or expects them to be retrieved
+from the model.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="pygurobi.filter_constraints">
 <code class="descclassname">pygurobi.</code><code class="descname">filter_constraints</code><span class="sig-paren">(</span><em>constraints</em>, <em>filter_values</em>, <em>exclude=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.filter_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a list of constraints and return a list of those constraints
@@ -82,6 +128,24 @@ index_values dictionary provides index numbers as keys
 and a list of index values as values.
 If exlude is False then return variables that match the filters.
 If exclude is True than return variables that do not match the filters.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygurobi.get_constraint_attrs">
+<code class="descclassname">pygurobi.</code><code class="descname">get_constraint_attrs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_constraint_attrs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of constraint attributes.</p>
+<p>Details of attributes found at the Gurobi
+website: 
+<a class="reference external" href="http://www.gurobi.com/documentation/6.5/refman/attributes.html">http://www.gurobi.com/documentation/6.5/refman/attributes.html</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygurobi.get_constraint_index_value">
+<code class="descclassname">pygurobi.</code><code class="descname">get_constraint_index_value</code><span class="sig-paren">(</span><em>constraint</em>, <em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_constraint_index_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value of the given index
+for a given constraint.</p>
+<p>Constraint names are assumed to be given
+as A(a,c,d, ....,f)</p>
 </dd></dl>
 
 <dl class="function">
@@ -116,7 +180,29 @@ of the specified index and values a list of
 constraints having that index.</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="pygurobi.get_constraints_by_index_values">
+<code class="descclassname">pygurobi.</code><code class="descname">get_constraints_by_index_values</code><span class="sig-paren">(</span><em>model</em>, <em>name</em>, <em>index_values</em>, <em>exclude=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_constraints_by_index_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of constraints filtered by index values.</p>
+<p>If exlude is False then return constraints that match the filters.
+If exclude is True than return constraints that do not match the filters.</p>
+</dd></dl>
 
+<dl class="function">
+<dt id="pygurobi.get_constraints_multiple">
+<code class="descclassname">pygurobi.</code><code class="descname">get_constraints_multiple</code><span class="sig-paren">(</span><em>model</em>, <em>names_list</em>, <em>approx=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_constraints_multiple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of constraints given by the constraint
+set names in names_list.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygurobi.get_grb_sense_from_string">
+<code class="descclassname">pygurobi.</code><code class="descname">get_grb_sense_from_string</code><span class="sig-paren">(</span><em>sense</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_grb_sense_from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the GRB constraint sense object
+corresponding to the supplied string.</p>
+<p>Convention follows the Gurobi docs:
+<a class="reference external" href="https://www.gurobi.com/documentation/6.5/refman/sense.html#attr:Sense">https://www.gurobi.com/documentation/6.5/refman/sense.html#attr:Sense</a></p>
+</dd></dl>
 
 <dl class="function">
 <dt id="pygurobi.get_linexp_by_index">
@@ -133,6 +219,23 @@ expression.</p>
 of variables.</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="pygurobi.get_variable_attrs">
+<code class="descclassname">pygurobi.</code><code class="descname">get_variable_attrs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_variable_attrs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of variable attributes.</p>
+<p>Details of attributes found at the Gurobi
+website: 
+<a class="reference external" href="http://www.gurobi.com/documentation/6.5/refman/attributes.html">http://www.gurobi.com/documentation/6.5/refman/attributes.html</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygurobi.get_variable_index_value">
+<code class="descclassname">pygurobi.</code><code class="descname">get_variable_index_value</code><span class="sig-paren">(</span><em>variable</em>, <em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_variable_index_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value of the given index
+for a given variable.</p>
+<p>Variable names are assumed to be given
+as A[a,c,d, ....,f]</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="pygurobi.get_variables">
@@ -169,6 +272,10 @@ of the specified index and values a list of
 variables having that index.</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="pygurobi.get_variables_by_index_values">
+<code class="descclassname">pygurobi.</code><code class="descname">get_variables_by_index_values</code><span class="sig-paren">(</span><em>model</em>, <em>name</em>, <em>index_values</em>, <em>exclude=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_variables_by_index_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="pygurobi.get_variables_by_two_indices">
@@ -279,6 +386,33 @@ variables.</p>
 <dd><p>Print a dictionary of variables, summed by index.</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="pygurobi.print_variables_to_csv">
+<code class="descclassname">pygurobi.</code><code class="descname">print_variables_to_csv</code><span class="sig-paren">(</span><em>file_name</em>, <em>model=''</em>, <em>name=''</em>, <em>variables=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.print_variables_to_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the specified variables to a csv file
+given by the file_name parameter.</p>
+<p>If no variables specified than all model
+variables written.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygurobi.print_variables_to_csv_by_index">
+<code class="descclassname">pygurobi.</code><code class="descname">print_variables_to_csv_by_index</code><span class="sig-paren">(</span><em>file_name</em>, <em>index</em>, <em>model=''</em>, <em>name=''</em>, <em>variables=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.print_variables_to_csv_by_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the sums of variables by the specified index
+to a csv file.</p>
+<p>Default behaviour of the function is to overwrite
+the given file_name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pygurobi.print_variables_to_json_by_index">
+<code class="descclassname">pygurobi.</code><code class="descname">print_variables_to_json_by_index</code><span class="sig-paren">(</span><em>file_name</em>, <em>index</em>, <em>model=''</em>, <em>name=''</em>, <em>variables=''</em>, <em>index_alias=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.print_variables_to_json_by_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the specified variables to a json file given by file_name
+organized by the specified index.</p>
+<p>Formatted for reading into nvD3 applications.</p>
+<p>Default behaviour is to overwrite file if one exists in
+file_name&#8217;s location.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="pygurobi.read_model">
@@ -352,6 +486,12 @@ for the given variable  and values dictionaries
 of the given variables summed over index2.</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="pygurobi.variables_check">
+<code class="descclassname">pygurobi.</code><code class="descname">variables_check</code><span class="sig-paren">(</span><em>model</em>, <em>name</em>, <em>variables</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.variables_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the appropriate
+variables based on the information supplied.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="pygurobi.zero_all_objective_coeffs">
@@ -371,6 +511,9 @@ of the given variables summed over index2.</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">pygurobi package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#pygurobi-pygurobi-module">pygurobi.pygurobi module</a></li>
+<li><a class="reference internal" href="#module-pygurobi">Module contents</a></li>
 </ul>
 </li>
 </ul>
