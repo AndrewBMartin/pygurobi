@@ -1,0 +1,7 @@
+pygurobi
+========
+
+.. toctree::
+   :maxdepth: 4
+
+   pygurobi

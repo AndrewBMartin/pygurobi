@@ -1,0 +1,22 @@
+pygurobi package
+================
+
+Submodules
+----------
+
+pygurobi.pygurobi module
+------------------------
+
+.. automodule:: pygurobi.pygurobi
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: pygurobi
+    :members:
+    :undoc-members:
+    :show-inheritance:

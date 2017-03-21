@@ -1,3 +1,25 @@
 
 Gurobi 5.6.0 (mac64) logging started Wed Jul 20 11:59:35 2016
 
+
+Gurobi 7.0.1 (mac64, Python) logging started Mon Mar 20 16:02:34 2017
+
+Read LP format model from file pygurobi/forest.lp
+Reading time = 0.01 seconds
+: 160 rows, 1945 columns, 10172 nonzeros
+Optimize a model with 160 rows, 1945 columns and 10172 nonzeros
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+02]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+00, 1e+01]
+Presolve removed 50 rows and 1102 columns
+Presolve time: 0.01s
+Presolved: 110 rows, 843 columns, 2770 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0    4.1153473e+04   1.100000e+01   0.000000e+00      0s
+      19    4.0724706e+04   0.000000e+00   0.000000e+00      0s
+
+Solved in 19 iterations and 0.01 seconds
+Optimal objective  4.072470571e+04
