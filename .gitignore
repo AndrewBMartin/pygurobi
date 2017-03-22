@@ -1,1 +1,4 @@
 *.rst
+docs/
+_build_html/
+gurobi.log

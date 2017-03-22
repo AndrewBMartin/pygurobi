@@ -147,10 +147,10 @@ As an example, consider the case where we want to see the volume of softwood, sw
 ```python
 # Print periodic softwood harvest volume.
 
->>> # Pass the following function a dictionary with index numbers as keys
->>> # and index values to filter by as values. In this example, {0: "sw"} says only return variables
+>>> # `pg.get_variables` can also take a dictionary of index numbers and  
+>>> # and index values to filter variables by. In this example, {0: "sw"} says only return variables
 >>> # that have value "sw" (softwood) in index 0.
->>> softwood_harvest = pg.get_variables_by_index_values(m, "harv", {0: "sw"})
+>>> softwood_harvest = pg.get_variables(m, "harv", filter_values={0: "sw"})
 >>> periodic_softwood_harvest = pg.sum_variables_by_index(-1, variables=softwood_harvest)
 >>> pg.print_dict(periodic_softwood_harvest)
 0, 2837.77312547
@@ -166,9 +166,9 @@ As an example, consider the case where we want to see the volume of softwood, sw
 ```
 Here we got a list of variables representing softwood harvest volumes using `pg.get_variables_by_index_values`, and then passed them to `pg.sum_variables_by_index` to sum the variables by period.
 
-To demonstrate how much code PyGurobi can save you from writing, consider printing this same data using only the Gurobi Python API. 
+To demonstrate the code PyGurobi can save you from writing, consider printing this same data using only the Gurobi Python API. 
 ```python
->>> # Print periodic softwood volume
+>>> # Print periodic softwood harvest volume
 >>> 
 >>> # Possible to do this step with a list comprehension in fewer lines, 
 >>> # but that would be less clear.
@@ -273,10 +273,10 @@ Looking at harvest volumes, we see that they're all over the place. In the last 
 >>> for n in range(9):
 >>> 
 >>>     # Get harvest variables from period n
->>>     variables1 = pg.get_variables_by_index_values(m, "harv", {-1: n})
+>>>     variables1 = pg.get_variables(m, "harv", filter_values={-1: n})
 >>>     
 >>>     # Get harvest variables from period n+1
->>>     variables2 = pg.get_variables_by_index_values(m, "harv", {-1: n+1})
+>>>     variables2 = pg.get_variables(m, "harv", filter_values={-1: n+1})
 >>>     
 >>>     # Create  constraint in the form Σ(variables1) = Σ(variables2)
 >>>     pg.add_constraint_variables(m, variables1, variables2, sense="=", con_name="even")
