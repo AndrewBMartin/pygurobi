@@ -15,15 +15,8 @@ I'm not associated with the Gurobi company, just a long-time user of their produ
 
 **Install**: `pip install pygurobi` or download this repo and run `python setup.py install`
 
-An important note before starting, PyGurobi by default assumes that *variable names* are separated from indices by square brackets "[" and "]", and that *constraint names* are separated from indices by round brackets "(" and ")". For example, variables look like **x[i,j]** and constraints look like **env(r,t)**. If this is not your convention then you can modify PyGurobi to use your bracketing convetion by accessing the source code. You can find the location of the PyGurobi source code using the `inspect.getfile()` command:
-```python
->>> import inspect
->>> import pygurobi
->>> inspect.getfile(pygurobi)
-'/Users/admin/app/env/lib/python2.7/site-packages/pygurobi/__init__.pyc' 
->>> # Your path will be different but should still have "/pygurobi/__init__.py" at the end.
-```
-If you've installed PyGurobi, then when you issue `inspect.getfile(pygurobi)` you'll see the path to the PyGurobi folder with the same ending as the one shown above. Open this folder and then open the [pygurobi.py](https://github.com/AndrewBMartin/pygurobi/blob/master/pygurobi/pygurobi.py) file in a texteditor. Change the `CON_BRACKET_L`, `CON_BRACKET_R`, `VAR_BRACKET_L` and `VAR_BRACKET_R` global variables to the constraint and variable brackets that you use, and you'll be set to go.
+**docs**: [Documentation](https://andrewbmartin.github.io/pygurobi)
+
 
 #### Example Model
 
@@ -279,7 +272,7 @@ Looking at harvest volumes, we see that they're all over the place. In the last 
 >>>     variables2 = pg.get_variables(m, "harv", filter_values={-1: n+1})
 >>>     
 >>>     # Create  constraint in the form Σ(variables1) = Σ(variables2)
->>>     pg.add_constraint_variables(m, variables1, variables2, sense="=", con_name="even")
+>>>     pg.add_constraint_variables(m, variables1, variables2, sense="=", con_name="even({0})".format(n))
 ```
 
 So now we've added a set of constraints, called **even**, that say in each period the volume harvested must equal the volume harvested in the next period. 
@@ -333,4 +326,16 @@ And, by species, showing the proportion of harvest volume that comes from softwo
 
 And that wraps up our introduction to PyGurobi. With this forest management model example, we've shown some of the key features of PyGurobi. We analyzed model variables in just a few lines of code, we added a non-trivial constraint with a simple for-loop, and we visualized the results of our modelling using 1 and 2 index graphs.
 
-There's more to discover once you get started using PyGurobi, but I hope this tutorial has given you a taste of how to use it to make modelling in Gurobi faster and easier.
+There's more to discover once you get started using PyGurobi, so I hope this tutorial has given you a taste of how to use it to make modelling in Gurobi faster and easier.
+
+#### A note before starting
+
+PyGurobi by default assumes that *variable names* are separated from indices by square brackets "[" and "]", and that *constraint names* are separated from indices by round brackets "(" and ")". For example, variables look like **x[i,j]** and constraints look like **env(r,t)**. If this is not your convention then you can modify PyGurobi to use your bracketing convetion by accessing the source code. You can find the location of the PyGurobi source code using the `inspect.getfile()` command:
+```python
+>>> import inspect
+>>> import pygurobi
+>>> inspect.getfile(pygurobi)
+'/Users/admin/app/env/lib/python2.7/site-packages/pygurobi/__init__.pyc' 
+>>> # Your path will be different but should still have "/pygurobi/__init__.py" at the end.
+```
+If you've installed PyGurobi, then when you issue `inspect.getfile(pygurobi)` you'll see the path to the PyGurobi folder with the same ending as the one shown above. Open this folder and then open the [pygurobi.py](https://github.com/AndrewBMartin/pygurobi/blob/master/pygurobi/pygurobi.py) file in a texteditor. Change the `CON_BRACKET_L`, `CON_BRACKET_R`, `VAR_BRACKET_L` and `VAR_BRACKET_R` global variables to the constraint and variable brackets that you use, and you'll be set to go.
