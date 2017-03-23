@@ -1,13 +1,17 @@
 """
-15 July 2016
+Functions to support rapid interactive modification of Gurobi models.
 
-A library of functions to analyze and modify Gurobi models.
-
+For reference on Gurobi objects such as Models, Variables, and Constraints, see
+http://www.gurobi.com/documentation/7.0/refman/py_python_api_overview.html.
 """
 import csv
 import json
 
-import gurobipy as gp
+try:
+    import gurobipy as gp
+except ImportError:
+    raise ImportError("gurobipy not installed. Please see {0} to download".format(
+        "https://www.gurobi.com/documentation/6.5/quickstart_mac/the_gurobi_python_interfac.html"))
 
 
 # Assuming that constraints are of the form: 
@@ -793,9 +797,15 @@ def remove_constraints_from_model(model, name="", constraints=""):
     """
     Remove the given constraints from the model.
 
-    Specifiy either model and name parameters or supply a list of constraints
-    
+    Specifiy either model and name parameters or supply a list of constraints 
     """
+
+
+    if not model and not constraints:
+        raise ValueError("No model or constraints given")
+
+    if not model:
+        raise ValueError("No model given")
 
     # This is needed for the case where a list of 
     # constraints is provided because a model object 
@@ -841,7 +851,7 @@ def get_constraints_by_index(index, model="", name="", constraints=""):
     Specifiy either model and name parameters or supply a list of constraints
     """
 
-    if not index:
+    if index != 0 and not index:
         raise IndexError("No index given")
 
     if not model and not constraints:

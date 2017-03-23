@@ -30,7 +30,7 @@ The variables are:
 
 * **x[i,j]** - the number of hectares of cut-block, *i*, to be managed under schedule *j*, where *j* is a sequence of harvests. Each cut-block, *i*, has both hardwood and softwood timber species, belongs to either the north or south region, and has an initial age.
 
-* **harv[s,r,t]** - the volume of timber harvested from cut-blocks of species *s* (softwood or hardwood), in region, *r* (north or south), , in period *t*. 
+* **harv[s,r,t]** - the volume of timber harvested from cut-blocks of species *s* (softwood or hardwood), in region, *r* (north or south), in period *t*. 
 
 * **age[r,t]** - the area of the forest that is at least 60 years old in region, *r*, and period, *t*.
 
