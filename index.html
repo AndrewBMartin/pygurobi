@@ -42,166 +42,286 @@
           <div class="body" role="main">
             
   <div class="section" id="pygurobi-package">
-<h1>PyGurobi package<a class="headerlink" href="#pygurobi-package" title="Permalink to this headline">¶</a></h1>
+<h1>PyGurobi package documentation<a class="headerlink" href="#pygurobi-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="pygurobi-module">
 <h2>pygurobi module<a class="headerlink" href="#pygurobi-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-pygurobi">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pygurobi" title="Permalink to this headline">¶</a></h2>
-<p>15 July 2016</p>
-<p>A library of functions to analyze and modify Gurobi models.</p>
+<p>Functions to support rapid interactive modification of Gurobi models.</p>
+<p>For reference on Gurobi objects such as Models, Variables, and Constraints, see the 
+<a href="http://www.gurobi.com/documentation/7.0/refman/py_python_api_overview.html">Gurobi Python API</a>.</p>
+<p>
 <dl class="function">
 <dt id="pygurobi.add_constraint_constant">
 <code class="descclassname">pygurobi.</code><code class="descname">add_constraint_constant</code><span class="sig-paren">(</span><em>model</em>, <em>variables</em>, <em>constant</em>, <em>sense='&lt;'</em>, <em>con_name=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.add_constraint_constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add constraint to model that says the sum of 
-variables must be =, &lt;, or , &gt; a constant.</p>
+variables must be equal, less than or equal, or, greater than or equal, a constant.</p>
 </dd>
-<dd><span class="parameters">Parameters</span></dd>
-<dd>model: Gurobi model object</dd>
-<dd>variables: List of Gurobi variables</dd>
-<dd>constant: Any number</dd>
-<dd>sense: one of "&gt", "&lt", "=", representing greater than or equal, less than or equal, and equal, respectively.</dd>
-
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>variables</strong>: List of Gurobi variables</li>
+  <li><strong>constant</strong>: Any number</li>
+  <li><strong>sense</strong>: one of "&gt", "&lt", "=", representing greater than or equal, less than or equal, and equal, respectively.</li>
+  <li><strong>con_name</strong>: name of the to be added constraint</li>
+<ul></dd>
 </dl>
 
 <dl class="function">
 <dt id="pygurobi.add_constraint_variables">
 <code class="descclassname">pygurobi.</code><code class="descname">add_constraint_variables</code><span class="sig-paren">(</span><em>model</em>, <em>variables1</em>, <em>variables2</em>, <em>sense='='</em>, <em>con_name=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.add_constraint_variables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add constraint to model that says the sum of
-variables1 must be =, &lt; , &gt; the sum of variables2.</p>
-</dd></dl>
+a list of variables must be equal, less than or equal, or greater than or equal, the sum of another list of variables.</p>
+</dd>
+
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>variables1</strong>: List of Gurobi variables composing the left hand side of the constraint</li>
+  <li><strong>variables2</strong>: List of Gurobi variables composing the right hand side of the constraint</li>
+  <li><strong>constant</strong>: Any number</li>
+  <li><strong>sense</strong>: one of "&gt", "&lt", "=", representing greater than or equal, less than or equal, and equal, respectively.</li>
+  <li><strong>con_name</strong>: name of the to be added constraint</li>
+<ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.filter_constraints">
 <code class="descclassname">pygurobi.</code><code class="descname">filter_constraints</code><span class="sig-paren">(</span><em>constraints</em>, <em>filter_values</em>, <em>exclude=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.filter_constraints" title="Permalink to this definition">¶</a></dt>
-<dd><p>Take a list of constraints and return a list of those constraints
-that match the filter values.</p>
-<p>Filter values is a dictionary of index numbers to index values.</p>
-<p>If exclude is true than return the complement of the constraints
-that match the filter values.</p>
-</dd></dl>
+<dd><p>Return a new list of constraints that match the filter values from the given constraints list.</p>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>constraints</strong>: List of Gurobi constraint objects</li>
+  <li><strong>filter_values</strong>: Dictionary mapping index numbers to index values. For example {0: "a", 1: "b"} returns
+    constraints with first index value of "a" and second index value of "b".</li>
+  <li><strong>exclude</strong>: If True return the complement of of the constraints that match the filter values.</li>
+</ul></dd>
+
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.filter_variables">
 <code class="descclassname">pygurobi.</code><code class="descname">filter_variables</code><span class="sig-paren">(</span><em>variables</em>, <em>filter_values</em>, <em>exclude=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.filter_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a filtered list of variables.
-index_values dictionary provides index numbers as keys
-and a list of index values as values.
-If exlude is False then return variables that match the filters.
-If exclude is True than return variables that do not match the filters.</p>
-</dd></dl>
+
+<dd><p>Return a new list of variables that match the filter values from the given variables list.</p>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>variables</strong>: List of Gurobi variable objects</li>
+  <li><strong>filter_values</strong>: Dictionary mapping index numbers to index values. For example {0: "a", 1: "b"} returns
+    variables with first index value of "a" and second index value of "b".</li>
+  <li><strong>exclude</strong>: If True return the complement of of the constraints that match the filter values.</li>
+</ul></dd>
+
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.get_constraints">
 <code class="descclassname">pygurobi.</code><code class="descname">get_constraints</code><span class="sig-paren">(</span><em>model</em>, <em>name=''</em>, <em>approx=False</em>, <em>filter_values={}</em>, <em>exclude=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of constraints from the model
-given by name of the constraint set.
-Constraints are checked by the constraint set name. If
-approx is set to be true than check to see if
-each entry from names is &#8220;in&#8221; each constraint set name
-otherwise, check using &#8220;==&#8221;.</p>
-<p>Filter values is a dictionary of index numbers to index values that
-the constraints will be filtered by. If exclude is true than return
-the complement of the constraints matching the filter values.</p>
-<p>If names not specified, then return a list of
-all model constraints.</p>
-</dd></dl>
+selected by constraint set name.</dd>
+<dd><p>A constraint set is composed of all constraints
+sharing the same string identifier before the indices:
+A(2,3,4) and A(1,2,3) are in the same constraint set, A;
+A(2,3,4) and B(2,3,4) are in constraint sets A and B, respectively</p>
+<p>PyGurobi by default assumes that constraint set names are separated from indices by round brackets 
+"(" and ")". For example, constraints look like env(r,t) - where "env" in the constraint set name 
+and "r" and "t" are the index values. See the source for more details.</p>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of constraint set</li>
+  <li><strong>filter_values</strong>: Dictionary mapping index numbers to index values. For example {0: "a", 1: "b"} returns
+    constraints with first index value of "a" and second index value of "b".</li>
+  <li><strong>exclude</strong>: If True return the complement of of the constraints that match the filter values.</li>
+</ul></dd>
+
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.get_constraints_attr">
 <code class="descclassname">pygurobi.</code><code class="descname">get_constraints_attr</code><span class="sig-paren">(</span><em>attr</em>, <em>model=''</em>, <em>name=''</em>, <em>constraints=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_constraints_attr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary of constraint names and their
-corresponding attribute, specified by the attribute
-parameter.</p>
-</dd></dl>
+corresponding attribute value.</p> 
+<p>Specifiy either model and name parameters or supply a list of constraints</p>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>attr</strong>: Gurobi constraints attribute name</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of constraint set</li>
+  <li><strong>constraints</strong>: List of Gurobi constraint objects</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.get_constraints_by_index">
 <code class="descclassname">pygurobi.</code><code class="descname">get_constraints_by_index</code><span class="sig-paren">(</span><em>index</em>, <em>model=''</em>, <em>name=''</em>, <em>constraints=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_constraints_by_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a dictionary of constraints with keys
-of the specified index and values a list of
-constraints having that index.</p>
-</dd></dl>
+<dd><p>Return a dictionary mapping index values to lists of
+constraints having that index value.</p>
+<p>Specifiy either model and name parameters or supply a list of constraints</p>
+</dd>
+
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>index</strong>: Index number using Python list indexing - 0 corresponds to the first index.</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of constraint set</li>
+  <li><strong>constraints</strong>: List of Gurobi constraint objects</li>
+</ul></dd>
+
+</dl>
 
 
 
 <dl class="function">
 <dt id="pygurobi.get_linexp_by_index">
 <code class="descclassname">pygurobi.</code><code class="descname">get_linexp_by_index</code><span class="sig-paren">(</span><em>index</em>, <em>model=''</em>, <em>name=''</em>, <em>variables=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_linexp_by_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a dictionary of index value and linear expressions
-corresponding to that index value summed as a linear
-expression.</p>
-</dd></dl>
+<dd><p>Return a dictionary of index values to Gurobi linear expressions
+corresponding to the summation of variables that match the index value for the given index number.</p>
+<p>Specifiy either model and name parameters or supply a list of variables</p>
+</dd>
+
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>index</strong>: Index number using Python list indexing - 0 corresponds to the first index.</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of variables set</li>
+  <li><strong>variables</strong>: List of Gurobi variable objects</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.get_linexp_from_variables">
 <code class="descclassname">pygurobi.</code><code class="descname">get_linexp_from_variables</code><span class="sig-paren">(</span><em>variables</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_linexp_from_variables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a linear expression from the supplied list
 of variables.</p>
-</dd></dl>
+</dd>
+
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>variables</strong>: List of Gurobi variable objects</li>
+</ul></dd>
+</dl>
 
 
 <dl class="function">
 <dt id="pygurobi.get_variables">
 <code class="descclassname">pygurobi.</code><code class="descname">get_variables</code><span class="sig-paren">(</span><em>model</em>, <em>name=''</em>, <em>approx=False</em>, <em>filter_values={}</em>, <em>exclude=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of variables from the variable
-set given by name.
-Variables are checked by the variable set name. If
-approx is set to be true than check to see if
-each entry from names is &#8220;in&#8221; each variable set name
-otherwise, check using &#8220;==&#8221;.</p>
-<p>filter_values is a dicitonary of index to value to filter 
-for. Exclude means when filtering return variables that match the index
-or return values that do not match the index.</p>
-<p>If name not specified, then return a list of
-all model variables. filter_values can still be specified to filter
-over all the model variables.</p>
-</dd></dl>
+<dd><p>Return a list of variables from the model
+selected by variable set name.</dd>
+<dd>
+<p>A variable set is composed of all variables
+sharing the same string identifier before the indices:
+A[2,3,4] and A[1,2,3] are in the same variable set, A;
+A[2,3,4] and B[2,3,4] are in varible sets A and B, respectively</p>
+<p>
+PyGurobi by default assumes that *variable names* are separated from indices by square brackets "[" and "]", 
+For example, variables look like x[i,j] - "x" in the variable set name, and "i" and "j" and the variable's index values.
+See the source code for more details.</p></dd>
+
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of variable set</li>
+  <li><strong>filter_values</strong>: Dictionary mapping index numbers to index values. For example {0: "a", 1: "b"} returns
+    variables with first index value of "a" and second index value of "b".</li>
+  <li><strong>exclude</strong>: If True return the complement of of the variables that match the filter values.</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.get_variables_attr">
 <code class="descclassname">pygurobi.</code><code class="descname">get_variables_attr</code><span class="sig-paren">(</span><em>attr</em>, <em>model=''</em>, <em>name=''</em>, <em>variables=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_variables_attr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a dictionary of variables names for the given
-variable set mapped to
-attribute values for the specified attribute.</p>
-<p>Can take a model object along with the variable set name, 
-or a list of variables as input.</p>
-</dd></dl>
+<dd><p>Return a dictionary of variables names and their
+corresponding attribute value.</p> 
+<p>Specifiy either model and name parameters or supply a list of variables</p>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>attr</strong>: Gurobi variables attribute name</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of variable set</li>
+  <li><strong>variables</strong>: List of Gurobi variables objects</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.get_variables_by_index">
 <code class="descclassname">pygurobi.</code><code class="descname">get_variables_by_index</code><span class="sig-paren">(</span><em>index</em>, <em>model=''</em>, <em>name=''</em>, <em>variables=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_variables_by_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a dictionary of variables with keys
-of the specified index and values a list of
-variables having that index.</p>
-</dd></dl>
+<dd><p>Return a dictionary mapping index values to lists of
+matching variables.</p>
+<p>Specifiy either model and name parameters or supply a list of variables</p>
+</dd>
+
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>index</strong>: Index number using Python list indexing - 0 corresponds to the first index.</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of variable set</li>
+  <li><strong>variables</strong>: List of Gurobi variable objects</li>
+</ul></dd>
+
+</dl>
 
 
 <dl class="function">
 <dt id="pygurobi.get_variables_by_two_indices">
 <code class="descclassname">pygurobi.</code><code class="descname">get_variables_by_two_indices</code><span class="sig-paren">(</span><em>index1</em>, <em>index2</em>, <em>model=''</em>, <em>name=''</em>, <em>variables=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.get_variables_by_two_indices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a dictionary having keys of index1 names for the given
-variables and the given variables and values dictionaries
-of the given variable by index2.</p>
-</dd></dl>
+<dd><p>Return a dictionary of variables mapping index1 values
+to dictionaries mapping
+index2 values to matching variables.</p>
+<p>Specifiy either model and name parameters or supply a list of variables</p></dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>index1</strong>: Index number using Python list indexing - 0 corresponds to the first index.</li>
+  <li><strong>index2</strong>: Index number using Python list indexing - 0 corresponds to the first index.</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of variable set</li>
+  <li><strong>variables</strong>: List of Gurobi variable objects</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.graph_by_index">
 <code class="descclassname">pygurobi.</code><code class="descname">graph_by_index</code><span class="sig-paren">(</span><em>model</em>, <em>variables</em>, <em>index</em>, <em>title=''</em>, <em>y_axis=''</em>, <em>x_axis=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.graph_by_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Display a graph of the variable against the specified index
-using matplotlib.</p>
+<dd><p>Display a graph of variables against the specified index.</p>
 <p>Matplotlib must already be installed to use this.
 See: <a class="reference external" href="http://matplotlib.org/faq/installing_faq.html">http://matplotlib.org/faq/installing_faq.html</a></p>
-</dd></dl>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>variables</strong>: List of Gurobi variable objects</li>
+  <li><strong>index</strong>: Index number using Python list indexing - 0 corresponds to the first index.</li>
+  <li><strong>title</strong>: Graph title</li>
+  <li><strong>y_axis</strong>: Title for y-axis</li>
+  <li><strong>x_axis</strong>: Title for x-axis</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.graph_by_two_indices">
 <code class="descclassname">pygurobi.</code><code class="descname">graph_by_two_indices</code><span class="sig-paren">(</span><em>model</em>, <em>variables</em>, <em>index1</em>, <em>index2</em>, <em>title=''</em>, <em>y_axis=''</em>, <em>x_axis=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.graph_by_two_indices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Display a graph of the variable summed over index2
-given by index1.</p>
+<dd><p>Display a graph of the variable summed over index2 against index1.</p>
 <p>Matplotlib must already be installed to use this.
 See: <a class="reference external" href="http://matplotlib.org/faq/installing_faq.html">http://matplotlib.org/faq/installing_faq.html</a></p>
-</dd></dl>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>variables</strong>: List of Gurobi variable objects</li>
+  <li><strong>index1</strong>: Index number using Python list indexing - 0 corresponds to the first index.</li>
+  <li><strong>index2</strong>: Index number using Python list indexing - 0 corresponds to the first index.</li>
+  <li><strong>title</strong>: Graph title</li>
+  <li><strong>y_axis</strong>: Title for y-axis</li>
+  <li><strong>x_axis</strong>: Title for x-axis</li>
+</ul></dd>
+
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.list_constraints">
@@ -213,7 +333,12 @@ number of constraints in that set.</p>
 sharing the same string identifier before the indices:
 A(2,3,4) and A(1,2,3) are in the same constraint set, A;
 A(2,3,4) and B(2,3,4) are in constraint sets A and B, respectively</p>
-</dd></dl>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>model</strong>: Gurobi model object</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.list_variables">
@@ -225,146 +350,256 @@ number of variables in that set.</p>
 sharing the same string identifier before the indices:
 A[2,3,4] and A[1,2,3] are in the same variable set, A;
 A[2,3,4] and B[2,3,4] are in variable sets A and B, respectively</p>
-</dd></dl>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>model</strong>: Gurobi model object</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.print_constraints">
 <code class="descclassname">pygurobi.</code><code class="descname">print_constraints</code><span class="sig-paren">(</span><em>constraints</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.print_constraints" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print constraints in an aesthetically pleasing way.</p>
-</dd></dl>
+<dd><p>Print a list of constraints to screen</p>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>constraints</strong>: List of Gurobi constraint objects</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.print_constraints_attr">
 <code class="descclassname">pygurobi.</code><code class="descname">print_constraints_attr</code><span class="sig-paren">(</span><em>attr</em>, <em>model=''</em>, <em>name=''</em>, <em>constraints=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.print_constraints_attr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print to screen a list of constraint attribute values
 given by the constraints specified in the names parameter.</p>
-<p>If a model is given then first get the constraints from
-the model and then print the specified attributes.</p>
-<p>If a list of constraints is given then print the 
-attributes of the constraints to screen.</p>
-<p>If names not specified then return atttributes for all 
-constraints.</p>
-<p>If attrs not specified return nothing. Same applies if
-neither model nor constraints is given.</p>
-</dd></dl>
+<p>Specifiy either model and name parameters or supply a list of constraints</p>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>attr</strong>: Gurobi constraints attribute name</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of constraint set</li>
+  <li><strong>constraints</strong>: List of Gurobi constraint objects</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.print_dict">
 <code class="descclassname">pygurobi.</code><code class="descname">print_dict</code><span class="sig-paren">(</span><em>dictionary</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.print_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print a dictionary to screen.</p>
-</dd></dl>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>dictionary</strong>: Python dictionary</li>
+</ul></dd>
+</dl>
+
 
 <dl class="function">
 <dt id="pygurobi.print_two_indices_dict">
 <code class="descclassname">pygurobi.</code><code class="descname">print_two_indices_dict</code><span class="sig-paren">(</span><em>indices_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.print_two_indices_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print to screen a nested dictionary of 
-two indices.</p>
-</dd></dl>
+<dd><p>Print to screen a two level nested dictionary.</p>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>dictionary</strong>: Two level Python dictionary: e.g. a = {1: {2: 3}}</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.print_variables">
 <code class="descclassname">pygurobi.</code><code class="descname">print_variables</code><span class="sig-paren">(</span><em>variables</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.print_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print a list of variables to look good.</p>
-</dd></dl>
+<dd><p>Print a list of variables.</p>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>variables</strong>: List of Gurobi variable objects. </li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.print_variables_attr">
 <code class="descclassname">pygurobi.</code><code class="descname">print_variables_attr</code><span class="sig-paren">(</span><em>attr</em>, <em>model=''</em>, <em>name=''</em>, <em>variables=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.print_variables_attr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print to screen a list of variable attribute values
-given by the variables specified in the names parameter.</p>
-<p>If a model is given then first get the variables from
-the model and then print the specified attributes.</p>
-<p>If a list of variables is given then print the 
-attributes of the variables to screen.</p>
-<p>If names not specified then return atttributes for all 
-variables.</p>
-</dd></dl>
+<dd><p>Print to screen a dictionary of variables names and their
+corresponding attribute value.</p> 
+<p>Specifiy either model and name parameters or supply a list of variables</p>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>attr</strong>: Gurobi variables attribute name</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of variable set</li>
+  <li><strong>variables</strong>: List of Gurobi variables objects</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.print_variables_sum_by_index">
 <code class="descclassname">pygurobi.</code><code class="descname">print_variables_sum_by_index</code><span class="sig-paren">(</span><em>index</em>, <em>model=''</em>, <em>name=''</em>, <em>variables=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.print_variables_sum_by_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print a dictionary of variables, summed by index.</p>
-</dd></dl>
+<dd><p>Print a dictionary of variables, summed by the specified index.</p></dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>index</strong>: Index number using Python list indexing - 0 corresponds to the first index.</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of variable set</li>
+  <li><strong>variables</strong>: List of Gurobi variables objects</li>
+</ul></dd>
+</dl>
 
 
 <dl class="function">
 <dt id="pygurobi.read_model">
 <code class="descclassname">pygurobi.</code><code class="descname">read_model</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.read_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a model using gurobipy.</p>
-</dd></dl>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>filename</strong>: Gurobi compatible file describing an optimization model.</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.remove_constraints_from_model">
 <code class="descclassname">pygurobi.</code><code class="descname">remove_constraints_from_model</code><span class="sig-paren">(</span><em>model</em>, <em>name=''</em>, <em>constraints=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.remove_constraints_from_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove the specified constraints from the model.</p>
-</dd></dl>
+<dd><p>Remove the given constraints from the model.</p>
+<p>Specifiy either model and name parameters or supply a list of constraints</p>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of constraint set</li>
+  <li><strong>constraints</strong>: List of Gurobi constraints</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.remove_variables_from_model">
 <code class="descclassname">pygurobi.</code><code class="descname">remove_variables_from_model</code><span class="sig-paren">(</span><em>model</em>, <em>name=''</em>, <em>variables=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.remove_variables_from_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove the variables given by names or the variables list
-from the model.</p>
-<p>Model update not performed after variable removal.</p>
-</dd></dl>
+<dd><p>Remove the given variables from the model.</p>
+<p>Specifiy either model and name parameters or supply a list of constraints</p>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of variable set</li>
+  <li><strong>variables</strong>: List of Gurobi variables</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.reoptimize">
 <code class="descclassname">pygurobi.</code><code class="descname">reoptimize</code><span class="sig-paren">(</span><em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.reoptimize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update, reset, and optimize
-a model.</p>
-</dd></dl>
+<dd><p>Update, reset, and optimize a model.</p>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>model</strong>: Gurobi model object</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.set_constraints_attr">
 <code class="descclassname">pygurobi.</code><code class="descname">set_constraints_attr</code><span class="sig-paren">(</span><em>attr</em>, <em>val</em>, <em>model=''</em>, <em>name=''</em>, <em>constraints=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.set_constraints_attr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set an attribute of a model constraint.</p>
-</dd></dl>
+<dd><p>Set an attribute of a model constraint set.</p>
+<p>Specifiy either model and name parameters or supply a list of constraints</p></dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>attr</strong>: Gurobi constraints attribute name</li>
+  <li><strong>val</strong>: Constraint attribute value</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of variable set</li>
+  <li><strong>constraints</strong>: List of Gurobi constraints</li>
+</ul></dd>
+
+
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.set_constraints_rhs_as_percent">
 <code class="descclassname">pygurobi.</code><code class="descname">set_constraints_rhs_as_percent</code><span class="sig-paren">(</span><em>percent</em>, <em>model=''</em>, <em>name=''</em>, <em>constraints=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.set_constraints_rhs_as_percent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the rhs of a constraint set as a percent of its current rhs.</p>
+<dd><p>Set the right hand side (rhs) of a constraint set as a percentage of its current rhs.</p>
+<p>Specifiy either model and name parameters or supply a list of constraints</p></dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>percent</strong>: Number between 0 and 1</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of variable set</li>
+  <li><strong>constraints</strong>: List of Gurobi constraints</li>
+</ul>
 </dd></dl>
 
 <dl class="function">
 <dt id="pygurobi.set_variables_attr">
 <code class="descclassname">pygurobi.</code><code class="descname">set_variables_attr</code><span class="sig-paren">(</span><em>attr</em>, <em>val</em>, <em>model=''</em>, <em>name=''</em>, <em>variables=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.set_variables_attr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the attribute of a variable, given by attr, to value, given
-by val.</p>
-<p>Variabless selected using model object and variable set name, or
-a list of variables.</p>
-</dd></dl>
+<dd><p>Set an attribute of a model variable set.</p>
+<p>Specifiy either model and name parameters or supply a list of variables</p></dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>attr</strong>: Gurobi variables attribute name</li>
+  <li><strong>val</strong>: Variable attribute value</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of variable set</li>
+  <li><strong>variables</strong>: List of Gurobi variables</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.set_variables_bounds">
 <code class="descclassname">pygurobi.</code><code class="descname">set_variables_bounds</code><span class="sig-paren">(</span><em>lb=''</em>, <em>ub=''</em>, <em>model=''</em>, <em>name=''</em>, <em>variables=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.set_variables_bounds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the lower bound and/or upper bound for a variables set.</p>
-<p>All variables will receive the same bounds.</p>
-</dd></dl>
+<p>Specifiy either model and name parameters or supply a list of variables</p></dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>lb</strong>: Variable set lower bound</li>
+  <li><strong>val</strong>: Variable set upper bound</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of variable set</li>
+  <li><strong>variables</strong>: List of Gurobi variables</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.sum_variables_by_index">
 <code class="descclassname">pygurobi.</code><code class="descname">sum_variables_by_index</code><span class="sig-paren">(</span><em>index</em>, <em>model=''</em>, <em>name=''</em>, <em>variables=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.sum_variables_by_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a dictionary having keys of index names
-for the given variable index and values the sum
-of the solution values of all variables containing
-that index.</p>
-</dd></dl>
+<dd><p>Return a dictionary mapping index values to the sum
+of the solution values of all matching variables.</p>
+<p>Specifiy either model and name parameters or supply a list of variables</p></dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>index</strong>: Index number using Python list indexing - 0 corresponds to the first index.</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of variable set</li>
+  <li><strong>variables</strong>: List of Gurobi variables</li>
+</ul></dd>
+</dl>
 
 <dl class="function">
 <dt id="pygurobi.sum_variables_by_two_indices">
 <code class="descclassname">pygurobi.</code><code class="descname">sum_variables_by_two_indices</code><span class="sig-paren">(</span><em>index1</em>, <em>index2</em>, <em>model=''</em>, <em>name=''</em>, <em>variables=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.sum_variables_by_two_indices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a dictionary having keys of index1 names
-for the given variable  and values dictionaries
-of the given variables summed over index2.</p>
-</dd></dl>
+<dd><p>Return a dictionary mapping index1 values
+to dictionaries of the given variables summed over index2.</p>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>index1</strong>: Index number using Python list indexing - 0 corresponds to the first index.</li>
+  <li><strong>index2</strong>: Index number using Python list indexing - 0 corresponds to the first index.</li>
+  <li><strong>model</strong>: Gurobi model object</li>
+  <li><strong>name</strong>: Name of variable set</li>
+  <li><strong>variables</strong>: List of Gurobi variables</li>
+</ul></dd>
+</dl>
 
 
 <dl class="function">
 <dt id="pygurobi.zero_all_objective_coeffs">
 <code class="descclassname">pygurobi.</code><code class="descname">zero_all_objective_coeffs</code><span class="sig-paren">(</span><em>model</em><span class="sig-paren">)</span><a class="headerlink" href="#pygurobi.zero_all_objective_coeffs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set all objective coefficients in a model to zero.</p>
-</dd></dl>
+<dd><p>Set all variable objective coefficients in a model to zero.</p>
+</dd>
+<dd><strong>Parameters</strong></dd>
+<dd><ul>
+  <li><strong>model</strong>: Gurobi model object</li>
+</ul></dd>
+
+</dl>
 
 </div>
 </div>

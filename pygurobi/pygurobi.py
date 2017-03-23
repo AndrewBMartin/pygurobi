@@ -144,20 +144,19 @@ def list_variables(model):
 
 def get_variables(model, name="", approx=False, filter_values={}, exclude=False):
     """
-    Return a list of variables from the variable
-    set given by name.
-    Variables are checked by the variable set name. If
-    approx is set to be true than check to see if
-    each entry from names is "in" each variable set name
-    otherwise, check using "==".
-
-    filter_values is a dicitonary of index to value to filter 
-    for. Exclude means when filtering return variables that match the index
-    or return values that do not match the index.
-
-    If name not specified, then return a list of
-    all model variables. filter_values can still be specified to filter
-    over all the model variables.
+    Return a list of variables from the model
+    selected by variable set name.
+    
+    A variable set is composed of all variables
+    sharing the same string identifier before the indices:
+    A[2,3,4] and A[1,2,3] are in the same variable set, A;
+    A[2,3,4] and B[2,3,4] are in varaible sets A and B, respectively
+    
+    PyGurobi by default assumes that *variable names* are separated 
+    from indices by square brackets "[" and "]", 
+    For example, variables look like x[i,j] - "x" in the variable set name, 
+    and "i" and "j" and the variable's index values.
+    See the source code for more details.
     """
 
     variables = []
@@ -219,12 +218,11 @@ def check_constraint_attr(attr):
 
 def get_variables_attr(attr, model="", name="", variables=""):
     """
-    Return a dictionary of variables names for the given
-    variable set mapped to
-    attribute values for the specified attribute.
+    Return a dictionary of variables names and their
+    corresponding attribute value. 
 
-    Can take a model object along with the variable set name, 
-    or a list of variables as input.
+    Specifiy either model and name parameters or supply a list of variables
+    
     """
 
     if not attr:
@@ -249,17 +247,11 @@ def get_variables_attr(attr, model="", name="", variables=""):
 
 def print_variables_attr(attr, model="", name="", variables=""):
     """
-    Print to screen a list of variable attribute values
-    given by the variables specified in the names parameter.
+    Print to screen a dictionary of variables names and their
+    corresponding attribute value. 
+
+    Specifiy either model and name parameters or supply a list of variables
     
-    If a model is given then first get the variables from
-    the model and then print the specified attributes.
-
-    If a list of variables is given then print the 
-    attributes of the variables to screen.
-
-    If names not specified then return atttributes for all 
-    variables.
     """
 
     var_dict = get_variables_attr(attr, model=model,
@@ -272,11 +264,9 @@ def print_variables_attr(attr, model="", name="", variables=""):
 
 def set_variables_attr(attr, val, model="", name="", variables=""):
     """
-    Set the attribute of a variable, given by attr, to value, given
-    by val.
+    Set an attribute of a model variable set.
 
-    Variabless selected using model object and variable set name, or
-    a list of variables.
+    Specifiy either model and name parameters or supply a list of variables
     """
     if not attr or not val:
         raise AttributeError("No attribute or value specified")
@@ -313,7 +303,7 @@ def set_variables_bounds(lb="", ub="", model="", name="", variables=""):
     """
     Set the lower bound and/or upper bound for a variables set.
 
-    All variables will receive the same bounds.
+    Specifiy either model and name parameters or supply a list of variables
     """
 
     if lb:
@@ -327,10 +317,9 @@ def set_variables_bounds(lb="", ub="", model="", name="", variables=""):
 
 def remove_variables_from_model(model, name="", variables=""):
     """
-    Remove the variables given by names or the variables list
-    from the model.
+    Remove the given variables from the model.
 
-    Model update not performed after variable removal.
+    Specifiy either model and name parameters or supply a list of constraints
     """
 
     if not model and not variables:
@@ -396,6 +385,7 @@ def get_linexp_from_variables(variables):
     """
     Return a linear expression from the supplied list
     of variables.
+    
     """
     
     linexp = gp.LinExpr()
@@ -407,10 +397,10 @@ def get_linexp_from_variables(variables):
 
 def sum_variables_by_index(index, model="", name="", variables=""):
     """
-    Return a dictionary having keys of index names
-    for the given variable index and values the sum
-    of the solution values of all variables containing
-    that index.
+    Return a dictionary mapping index values to the sum
+    of the solution values of all matching variables.
+
+    Specifiy either model and name parameters or supply a list of variables
     """
 
     var_dict = get_variables_by_index(index, model=model, name=name,
@@ -447,9 +437,11 @@ def print_variables_sum_by_index(index, model="", name="", variables=""):
 
 def get_variables_by_index(index, model="", name="", variables=""):
     """
-    Return a dictionary of variables with keys
-    of the specified index and values a list of
-    variables having that index.
+    Return a dictionary mapping index values to lists of
+    matching variables.
+
+    Specifiy either model and name parameters or supply a list of variables
+    
     """
 
     if index != 0 and not index:
@@ -478,11 +470,9 @@ def get_variables_by_index(index, model="", name="", variables=""):
 
 def filter_variables(variables, filter_values, exclude=False):
     """
-    Return a filtered list of variables.
-    index_values dictionary provides index numbers as keys
-    and a list of index values as values.
-    If exlude is False then return variables that match the filters.
-    If exclude is True than return variables that do not match the filters.
+    Return a new list of variables that match the filter values 
+    from the given variables list.
+    
     """
 
     if not variables:
@@ -517,9 +507,11 @@ def get_variables_by_index_values(model, name, index_values, exclude=False):
     
 def get_variables_by_two_indices(index1, index2, model="", name="", variables=""):
     """
-    Return a dictionary having keys of index1 names for the given
-    variables and the given variables and values dictionaries
-    of the given variable by index2.
+    Return a dictionary of variables mapping index1 values
+    to dictionaries mapping
+    index2 values to matching variables.
+
+    Specifiy either model and name parameters or supply a list of variables
     """
     
     two_indices_dict = {}
@@ -541,9 +533,9 @@ def print_variables(variables):
     
 def sum_variables_by_two_indices(index1, index2, model="", name="", variables=""):
     """
-    Return a dictionary having keys of index1 names
-    for the given variable  and values dictionaries
-    of the given variables summed over index2.
+    Return a dictionary mapping index1 values
+    to dictionaries of the given variables summed over index2.
+    
     """
 
     two_indices_dict = get_variables_by_two_indices(index1, index2,
@@ -562,8 +554,7 @@ def sum_variables_by_two_indices(index1, index2, model="", name="", variables=""
  
 def print_two_indices_dict(indices_dict):
     """
-    Print to screen a nested dictionary of 
-    two indices.
+    Print to screen a two level nested dictionary.
     """
     
     for key, value in indices_dict.iteritems():
@@ -573,9 +564,11 @@ def print_two_indices_dict(indices_dict):
 
 def get_linexp_by_index(index, model="", name="", variables=""):
     """
-    Return a dictionary of index value and linear expressions
-    corresponding to that index value summed as a linear
-    expression.
+    Return a dictionary of index values to Gurobi linear expressions
+    corresponding to the summation of variables that match the index 
+    value for the given index number.
+    
+    Specifiy either model and name parameters or supply a list of variables.
     """
 
     linexps = {}
@@ -617,13 +610,8 @@ def get_constraints_multiple(model, names_list, approx=False):
 
 def filter_constraints(constraints, filter_values, exclude=False):
     """
-    Take a list of constraints and return a list of those constraints
-    that match the filter values.
-
-    Filter values is a dictionary of index numbers to index values.
-
-    If exclude is true than return the complement of the constraints
-    that match the filter values.
+    Return a new list of constraints that match the filter values from 
+    the given constraints list.
     """
     
     if not constraints:
@@ -658,18 +646,18 @@ def get_constraints(model, name="", approx=False, filter_values={},
         exclude=False):
     """
     Return a list of constraints from the model
-    given by name of the constraint set.
-    Constraints are checked by the constraint set name. If
-    approx is set to be true than check to see if
-    each entry from names is "in" each constraint set name
-    otherwise, check using "==".
+    selected by constraint set name.
 
-    Filter values is a dictionary of index numbers to index values that
-    the constraints will be filtered by. If exclude is true than return
-    the complement of the constraints matching the filter values.
+    A constraint set is composed of all constraints
+    sharing the same string identifier before the indices:
+    A(2,3,4) and A(1,2,3) are in the same constraint set, A;
+    A(2,3,4) and B(2,3,4) are in constraint sets A and B, respectively
 
-    If names not specified, then return a list of
-    all model constraints.
+    PyGurobi by default assumes that constraint set names are 
+    separated from indices by round brackets 
+    "(" and ")". For example, constraints look like env(r,t) - where "env" 
+    in the constraint set name 
+    and "r" and "t" are the index values. See the source for more details.
     """
 
     if not name:
@@ -711,8 +699,9 @@ def constraints_check(model, name, constraints):
 def get_constraints_attr(attr, model="", name="", constraints=""):
     """
     Return a dictionary of constraint names and their
-    corresponding attribute, specified by the attribute
-    parameter.
+    corresponding attribute value. 
+
+    Specifiy either model and name parameters or supply a list of constraints
     """
 
     if not attr:
@@ -738,17 +727,8 @@ def print_constraints_attr(attr, model="", name="", constraints=""):
     Print to screen a list of constraint attribute values
     given by the constraints specified in the names parameter.
     
-    If a model is given then first get the constraints from
-    the model and then print the specified attributes.
-
-    If a list of constraints is given then print the 
-    attributes of the constraints to screen.
-
-    If names not specified then return atttributes for all 
-    constraints.
-
-    If attrs not specified return nothing. Same applies if
-    neither model nor constraints is given.
+    Specifiy either model and name parameters or supply a list of constraints
+    
     """
 
     constraints = get_constraints_attr(attr, model=model,
@@ -760,7 +740,9 @@ def print_constraints_attr(attr, model="", name="", constraints=""):
 
 def set_constraints_attr(attr, val, model="", name="", constraints=""):
     """
-    Set an attribute of a model constraint.
+    Set an attribute of a model constraint set.
+
+    Specifiy either model and name parameters or supply a list of constraints
     """
 
     if not attr or not val:
@@ -783,7 +765,9 @@ def set_constraints_attr(attr, val, model="", name="", constraints=""):
 
 def set_constraints_rhs_as_percent(percent, model="", name="", constraints=""):
     """
-    Set the rhs of a constraint set as a percent of its current rhs.
+    Set the right hand side (rhs) of a constraint set as a percentage of its current rhs.
+
+    Specifiy either model and name parameters or supply a list of constraints
     """
 
     if percent != 0 and not percent:
@@ -807,7 +791,10 @@ def set_constraints_rhs_as_percent(percent, model="", name="", constraints=""):
 
 def remove_constraints_from_model(model, name="", constraints=""):
     """
-    Remove the specified constraints from the model.
+    Remove the given constraints from the model.
+
+    Specifiy either model and name parameters or supply a list of constraints
+    
     """
 
     # This is needed for the case where a list of 
@@ -848,9 +835,10 @@ def get_constraint_index_value(constraint, index):
 
 def get_constraints_by_index(index, model="", name="", constraints=""):
     """
-    Return a dictionary of constraints with keys
-    of the specified index and values a list of
-    constraints having that index.
+    Return a dictionary mapping index values to lists of
+    constraints having that index value.
+
+    Specifiy either model and name parameters or supply a list of constraints
     """
 
     if not index:
@@ -914,7 +902,8 @@ def add_constraint_constant(model, variables, constant, sense="<",
                                       con_name=""):
     """
     Add constraint to model that says the sum of 
-    variables must be =, <, or , > a constant.
+    variables must be equal, less than or equal, or, greater than or equal, a constant.
+    
     """
     
     if not variables:
@@ -962,7 +951,8 @@ def add_constraint_variables(model, variables1, variables2,
                                  sense="=", con_name=""):
     """
     Add constraint to model that says the sum of
-    variables1 must be =, < , > the sum of variables2.
+    a list of variables must be equal, less than or equal, 
+    or greater than or equal, the sum of another list of variables.
     """
 
     if not variables1 or not variables2:
