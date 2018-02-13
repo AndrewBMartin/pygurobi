@@ -11,7 +11,7 @@ PyGurobi extends the already awesome [Gurobi Python API](https://www.gurobi.com/
 
 I'm not associated with the Gurobi company, just a long-time user of their product.
 
-**Requirements**: Python 2.7+, a working [Gurobi](http://gurobi.com) license, [gurobipy](https://www.gurobi.com/documentation/6.5/quickstart_mac/the_gurobi_python_interfac.html) installed, optional (for graphing only) [Matplotlib](http://matplotlib.org/).
+**Requirements**: Python 2.7, a working [Gurobi](http://gurobi.com) license, [gurobipy](https://www.gurobi.com/documentation/6.5/quickstart_mac/the_gurobi_python_interfac.html) installed, optional (for graphing only) [Matplotlib](http://matplotlib.org/).
 
 **Install**: `pip install pygurobi` or download this repo and run `python setup.py install`
 
